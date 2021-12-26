@@ -21,6 +21,7 @@ Example of input data.
 ```
 
 ![diagram of the bus lines](img/Diagram_of_the_bus_line.jpg)
+
 Diagram of the bus lines
 ![documentation](img/Documentation.jpg)
 Documentation
