@@ -51,7 +51,7 @@ class DataBase:
         for k, v in self.format_errors.items():
             print(f'{k}: {v}')
 
-    def calculate_stops(self):
+    def calculate_stops(self) -> None:
         for i in self.database:
             bus_id = i['bus_id']
             if bus_id not in self.bus_info:
@@ -69,37 +69,37 @@ class DataBase:
         for bus, stops in self.bus_info.items():
             print(f'bus_id: {bus}, stops: {len(stops["stops"])}')
 
-    def find_transfer_stops(self):
-        self.calculate_stops()
+    def find_transfer_stops(self) -> list:
+        stops = []
+        for i in self.bus_info.values():
+            temp = []
+            for j in i["stops"]:
+                temp.append(j[0])
+            stops.append(temp)
+        if len(stops) <= 1:
+            return []
         transfer_stops = set()
-        for bus, stops in self.bus_info.items():
-            for b, s in self.bus_info.items():
-                if bus != b:
-                    first_line = set([i[0] for i in stops["stops"]])
-                    second_line = set([i[0] for i in s["stops"]])
-                    crossover = first_line.intersection(second_line)
-                    if crossover:
-                        transfer_stops.update(crossover)
-        return transfer_stops
+        for i in range(0, len(stops) - 1):
+            for j in range(i + 1, len(stops)):
+                transfer_stops.update(set(stops[i]) & set(stops[j]))
+        return sorted(transfer_stops)
 
-    #
-    # def print_bus_info(self):
-    #     self.calculate_stops()
-    #     start_stops = set()
-    #     finish_stops = set()
-    #
-    #     for k, v in self.bus_info.items():
-    #         if len(v['start']) != 1 or len(v["finish"]) != 1:
-    #             print(f'There is no start or end stop for the line: {k}.')
-    #             break
-    #         else:
-    #             start_stops.update(v["start"])
-    #             finish_stops.update(v["finish"])
-    #     else:
-    #         transfer_stops = self.find_transfer_stops()
-    #         print(f'Start stops: {len(start_stops)} {sorted(list(start_stops))}')
-    #         print(f'Transfer stops: {len(transfer_stops)} {sorted(list(transfer_stops))}')
-    #         print(f'Finish stops: {len(finish_stops)} {sorted(list(finish_stops))}')
+    def print_stops_info(self) -> None:
+        self.calculate_stops()
+        start_stops = set()
+        finish_stops = set()
+        for k, v in self.bus_info.items():
+            if len(v['start']) != 1 or len(v["finish"]) != 1:
+                print(f'There is no start or end stop for the line: {k}.')
+                break
+            else:
+                start_stops.update([i[0] for i in v["start"]])
+                finish_stops.update([i[0] for i in v["finish"]])
+        else:
+            transfer_stops = self.find_transfer_stops()
+            print(f'Start stops: {len(start_stops)} {sorted(start_stops)}')
+            print(f'Transfer stops: {len(transfer_stops)} {transfer_stops}')
+            print(f'Finish stops: {len(finish_stops)} {sorted(finish_stops)}')
 
     def check_time(self):
         self.calculate_stops()
@@ -150,7 +150,8 @@ def main():
     database_dict = input_database_file("buses.json")
     database_bus_company = DataBase(database_dict)
     # database_bus_company.check_demand()
-    database_bus_company.print_bus_info()
+    # database_bus_company.print_bus_info()
+    database_bus_company.print_stops_info()
 
 
 if __name__ == "__main__":
