@@ -10,6 +10,8 @@ class DataBase:
         self.type_errors = dict(bus_id=0, stop_id=0, stop_name=0, next_stop=0, stop_type=0, a_time=0)
         self.total_type_errors = 0
         self.bus_info = {}
+        self.time_errors = []
+        self.errors_stops = set()
 
     def check_data_type(self) -> None:
         data_type = dict(bus_id=int, stop_id=int, stop_name=str, next_stop=int, stop_type=str, a_time=str)
@@ -101,34 +103,39 @@ class DataBase:
             print(f'Transfer stops: {len(transfer_stops)} {transfer_stops}')
             print(f'Finish stops: {len(finish_stops)} {sorted(finish_stops)}')
 
-    def check_time(self):
+    def check_time_errors(self):
         self.calculate_stops()
-        errors = []
         for bus_name, bus in self.bus_info.items():
             previous_time = 0
             for name, time in bus["stops"]:
                 hours, minutes = time.split(":")
                 current_time = int(hours) * 60 + int(minutes)
                 if current_time <= previous_time:
-                    errors.append((bus_name, name))
+                    self.time_errors.append((bus_name, name))
                     break
                 previous_time = current_time
+
+    def print_time_errors(self):
+        self.check_time_errors()
         print("Arrival time test:")
-        if errors:
-            for bus, stop in errors:
+        if self.time_errors:
+            for bus, stop in self.time_errors:
                 print(f"bus_id line {bus}: wrong time on station {stop}")
         else:
             print("OK")
 
-    def check_demand(self):
+    def check_demand_errors(self):
+        self.calculate_stops()
         transfer_stops = self.find_transfer_stops()
-        errors_stops = set()
         for i in self.database:
             if i["stop_type"] == "O" and i["stop_name"] in transfer_stops:
-                errors_stops.add(i["stop_name"])
+                self.errors_stops.add(i["stop_name"])
+
+    def print_demand_errors(self):
+        self.check_demand_errors()
         print("On demand stops test:")
-        if errors_stops:
-            print("Wrong stop type: {0}".format(sorted(errors_stops)))
+        if self.errors_stops:
+            print("Wrong stop type: {0}".format(sorted(self.errors_stops)))
         else:
             print("OK")
 
@@ -151,7 +158,9 @@ def main():
     database_bus_company = DataBase(database_dict)
     # database_bus_company.check_demand()
     # database_bus_company.print_bus_info()
-    database_bus_company.print_stops_info()
+    # database_bus_company.print_stops_info()
+    # database_bus_company.print_time_errors()
+    database_bus_company.print_demand_errors()
 
 
 if __name__ == "__main__":
