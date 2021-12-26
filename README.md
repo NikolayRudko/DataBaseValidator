@@ -15,7 +15,7 @@ Example of input data.
         "stop_name": "Prospekt Avenue",
         "next_stop": 3,
         "stop_type": "S",
-        "a_time": 8.12
+        "a_time": "08:12"
     }
 ]
 ```

@@ -3,56 +3,53 @@ import re
 
 
 class DataBase:
-    TIME_PATTERN = re.compile(r"""^([01]\d|2[0-4])                  # hours format 
-                                            (:)                     # delimier                
-                                            ([0-5]\d)$              # minutes format
-                                            """, flags=re.VERBOSE)
-    STOP_TYPE_PATTERN = re.compile(r"^[S|O|F]{,1}$")
-    STOP_NAME_PATTERN = re.compile(r"^([A-Z]\w+ )+(Road|Avenue|Boulevard|Street)$")
-
     def __init__(self, database):
         self.database = database
-        self.errors = {
-            "bus_id": 0,
-            "stop_id": 0,
-            "stop_name": 0,
-            "next_stop": 0,
-            "stop_type": 0,
-            "a_time": 0
-        }
-        self.total_errors = 0
+        self.format_errors = dict(stop_name=0, stop_type=0, a_time=0)
+        self.total_format_errors = 0
+        self.type_errors = dict(bus_id=0, stop_id=0, stop_name=0, next_stop=0, stop_type=0, a_time=0)
+        self.total_type_errors = 0
         self.bus_info = {}
 
-    def check_data(self):
+    def check_data_type(self):
+        data_type = dict(bus_id=int, stop_id=int, stop_name=str, next_stop=int, stop_type=str, a_time=str)
+        required_fields = ["stop_name", 'a_time']
         for i in self.database:
-            if not isinstance(i['bus_id'], int):
-                self.errors['bus_id'] += 1
-            if not isinstance(i["stop_id"], int):
-                self.errors["stop_id"] += 1
-            if not self.check_field(i["stop_name"], self.STOP_NAME_PATTERN):
-                self.errors["stop_name"] += 1
-            if not isinstance(i["next_stop"], int):
-                self.errors["next_stop"] += 1
-            if not self.check_field(i["stop_type"], self.STOP_TYPE_PATTERN):
-                self.errors["stop_type"] += 1
-            if not self.check_field(i["a_time"], self.TIME_PATTERN):
-                self.errors["a_time"] += 1
-        self.calculate_total_errors()
+            for k, v in i.items():
+                if type(v) != data_type[k]:
+                    self.type_errors[k] += 1
+                    continue
+                if k == "stop_type" and not re.match(r"^.?$", v):
+                    self.type_errors[k] += 1
+                if k in required_fields and v == "":
+                    self.type_errors[k] += 1
+        self.total_type_errors = 0
+        for err in self.type_errors.values():
+            self.total_type_errors += err
 
-    def check_field(self, field, field_pattern) -> bool:
-        return isinstance(field, str) and field_pattern.match(field)
+    def print_data_type_errors(self):
+        self.check_data_type()
+        print(f"Type and required field validation: {self.total_type_errors} errors")
+        for k, v in self.type_errors.items():
+            print(f'{k}: {v}')
 
-    def calculate_total_errors(self):
-        self.total_errors = 0
-        for err in self.errors.values():
-            self.total_errors += err
+    def check_format_fields(self):
+        validation_fields = {"stop_name": re.compile(r"^([A-Z]\w+ )+(Road|Avenue|Boulevard|Street)$"),
+                             "stop_type": re.compile(r"^[SOF]?$"),
+                             "a_time": re.compile(r"^([01]\d|2[0-4])(:)([0-5]\d)$")}
+        for i in self.database:
+            for k, v in i.items():
+                if k in validation_fields and not validation_fields[k].match(v):
+                    self.format_errors[k] += 1
+        self.total_format_errors = 0
+        for err in self.format_errors.values():
+            self.total_format_errors += err
 
-    def print_errors(self):
-        self.check_data()
-        print(f"Format validation: {self.total_errors} errors")
-        for k, v in self.errors.items():
-            if k in ['stop_name', 'stop_type', 'a_time']:
-                print(f'{k}: {v}')
+    def print_format_fields_errors(self):
+        self.check_format_fields()
+        print(f"Format validation: {self.total_format_errors} errors")
+        for k, v in self.format_errors.items():
+            print(f'{k}: {v}')
 
     def calculate_stops(self):
         for i in self.database:
