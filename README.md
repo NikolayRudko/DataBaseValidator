@@ -21,14 +21,14 @@ Example of input data.
 ```
 
 ![diagram of the bus lines](img/Diagram_of_the_bus_line.jpg)
-###Diagram of the bus lines
+Diagram of the bus lines
 ![documentation](img/Documentation.jpg)
-###Documentation
+Documentation
 
 The program checks:
-1. ###Check that the data types match. Check that the required fields are filled in.
-2. ###Check that the data format complies with the documentation.
-3. ###Verify the number of stops for each line.
-4. ###Make sure each bus line has exactly one starting point and one final stop.
-5. ###Check that the arrival time for the upcoming stops for a given bus line is increasing.
-6. ###Check that all the departure points, final stops, and transfer stations are not "On-demand".
+1. Check that the data types match. Check that the required fields are filled in.
+2. Check that the data format complies with the documentation.
+3. Verify the number of stops for each line.
+4. Make sure each bus line has exactly one starting point and one final stop.
+5. Check that the arrival time for the upcoming stops for a given bus line is increasing.
+6. Check that all the departure points, final stops, and transfer stations are not "On-demand".
