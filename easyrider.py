@@ -11,7 +11,7 @@ class DataBase:
         self.total_type_errors = 0
         self.bus_info = {}
 
-    def check_data_type(self):
+    def check_data_type(self) -> None:
         data_type = dict(bus_id=int, stop_id=int, stop_name=str, next_stop=int, stop_type=str, a_time=str)
         required_fields = ["stop_name", 'a_time']
         for i in self.database:
@@ -27,16 +27,16 @@ class DataBase:
         for err in self.type_errors.values():
             self.total_type_errors += err
 
-    def print_data_type_errors(self):
+    def print_data_type_errors(self) -> None:
         self.check_data_type()
         print(f"Type and required field validation: {self.total_type_errors} errors")
         for k, v in self.type_errors.items():
             print(f'{k}: {v}')
 
-    def check_format_fields(self):
-        validation_fields = {"stop_name": re.compile(r"^([A-Z]\w+ )+(Road|Avenue|Boulevard|Street)$"),
-                             "stop_type": re.compile(r"^[SOF]?$"),
-                             "a_time": re.compile(r"^([01]\d|2[0-4])(:)([0-5]\d)$")}
+    def check_format_fields(self) -> None:
+        validation_fields = dict(stop_name=re.compile(r"^([A-Z]\w+ )+(Road|Avenue|Boulevard|Street)$"),
+                                 stop_type=re.compile(r"^[SOF]?$"),
+                                 a_time=re.compile(r"^([01]\d|2[0-3])(:)([0-5]\d)$"))
         for i in self.database:
             for k, v in i.items():
                 if k in validation_fields and not validation_fields[k].match(v):
@@ -45,7 +45,7 @@ class DataBase:
         for err in self.format_errors.values():
             self.total_format_errors += err
 
-    def print_format_fields_errors(self):
+    def print_format_fields_errors(self) -> None:
         self.check_format_fields()
         print(f"Format validation: {self.total_format_errors} errors")
         for k, v in self.format_errors.items():
@@ -62,6 +62,12 @@ class DataBase:
                 self.bus_info[bus_id]["start"].append(stop_info)
             elif i["stop_type"] == "F":
                 self.bus_info[bus_id]["finish"].append(stop_info)
+
+    def print_bus_info(self) -> None:
+        self.calculate_stops()
+        print("Line names and number of stops:")
+        for bus, stops in self.bus_info.items():
+            print(f'bus_id: {bus}, stops: {len(stops["stops"])}')
 
     def find_transfer_stops(self):
         self.calculate_stops()
@@ -140,10 +146,11 @@ def input_database_file(file_name: str) -> dict:
 
 
 def main():
-    database_dict = input_database_str()
-    # database_dict = input_database_file("example1.json")
+    # database_dict = input_database_str()
+    database_dict = input_database_file("buses.json")
     database_bus_company = DataBase(database_dict)
-    database_bus_company.check_demand()
+    # database_bus_company.check_demand()
+    database_bus_company.print_bus_info()
 
 
 if __name__ == "__main__":
