@@ -1,5 +1,5 @@
 # The program for checking the database of the company "Easy Rider".
-_(Task from [JetBrains Academy](https://hyperskill.org "JetBrains Academy") - track: Python Core)_
+>_(Task from [JetBrains Academy](https://hyperskill.org "JetBrains Academy") - track: Python Core)_
 
 We have a database in json format, the database may contain data in an incorrect format. Our task is to check the
 correctness of the data. We have two documents to verify the data, the first is the **documentation**, the second is
