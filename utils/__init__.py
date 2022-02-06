@@ -3,7 +3,7 @@ import json
 
 def input_database_str() -> dict:
     """
-    Read string from console, and return dict with data
+    Read json-string from console, and return dict with data
 
     :return: dict with data
     """
