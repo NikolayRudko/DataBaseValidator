@@ -1,6 +1,7 @@
 import re
 
 
+# todo add test
 class DatabaseProcessor:
     def __init__(self, database):
         self.database = database
@@ -13,6 +14,7 @@ class DatabaseProcessor:
         self.errors_stops = set()
 
     def check_data_type(self) -> None:
+        # todo add doc
         correct_data_type = dict(bus_id=int, stop_id=int, stop_name=str, next_stop=int, stop_type=str, a_time=str)
         required_fields = ["stop_name", 'a_time']
         for stop in self.database:
@@ -20,13 +22,12 @@ class DatabaseProcessor:
                 if type(value) != correct_data_type[key]:
                     self.type_errors[key] += 1
                     continue
+                # todo
                 if key == "stop_type" and not re.match(r"^.?$", value):
                     self.type_errors[key] += 1
                 if key in required_fields and value == "":
                     self.type_errors[key] += 1
-        self.total_type_errors = 0
-        for err in self.type_errors.values():
-            self.total_type_errors += err
+        self.total_type_errors = sum(self.type_errors.values())
 
     def print_data_type_errors(self) -> None:
         self.check_data_type()
@@ -38,10 +39,11 @@ class DatabaseProcessor:
         validation_fields = dict(stop_name=re.compile(r"^([A-Z]\w+ )+(Road|Avenue|Boulevard|Street)$"),
                                  stop_type=re.compile(r"^[SOF]?$"),
                                  a_time=re.compile(r"^([01]\d|2[0-3])(:)([0-5]\d)$"))
-        for i in self.database:
-            for k, v in i.items():
-                if k in validation_fields and not validation_fields[k].match(v):
-                    self.format_errors[k] += 1
+        for stop in self.database:
+            for key, value in stop.items():
+                if key in validation_fields and not validation_fields[key].match(value):
+                    self.format_errors[key] += 1
+        # todo try counter
         self.total_format_errors = 0
         for err in self.format_errors.values():
             self.total_format_errors += err
@@ -110,6 +112,9 @@ class DatabaseProcessor:
                 print(f'There is no start or end stop for the line: {bus_id}.')
                 break
             else:
+                # todo try:
+                # start_stops.update(stops["start"])
+                # finish_stops.update(stops["finish"])
                 start_stops.update([i[0] for i in stops["start"]])
                 finish_stops.update([i[0] for i in stops["finish"]])
         else:
