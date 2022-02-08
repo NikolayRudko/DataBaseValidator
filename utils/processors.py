@@ -1,28 +1,30 @@
 import re
 
 
-# todo add test
 class DatabaseProcessor:
     def __init__(self, database):
         self.database = database
-        self.format_errors = dict(stop_name=0, stop_type=0, a_time=0)
-        self.total_format_errors = 0
         self.type_errors = dict(bus_id=0, stop_id=0, stop_name=0, next_stop=0, stop_type=0, a_time=0)
         self.total_type_errors = 0
+        self.format_errors = dict(stop_name=0, stop_type=0, a_time=0)
+        self.total_format_errors = 0
         self.bus_route_info = {}
         self.time_errors = []
         self.errors_stops = set()
 
     def check_data_type(self) -> None:
-        # todo add doc
+        """
+        Check input data for compliance with documentation.
+        Fields 'stop_name', 'a_time' should not be empty.
+        Errors are sorted and added to the type_errors dictionary. The total number of errors is also calculated.
+        """
         correct_data_type = dict(bus_id=int, stop_id=int, stop_name=str, next_stop=int, stop_type=str, a_time=str)
-        required_fields = ["stop_name", 'a_time']
+        required_fields = ("stop_name", 'a_time')
         for stop in self.database:
             for key, value in stop.items():
                 if type(value) != correct_data_type[key]:
                     self.type_errors[key] += 1
                     continue
-                # todo
                 if key == "stop_type" and not re.match(r"^.?$", value):
                     self.type_errors[key] += 1
                 if key in required_fields and value == "":
@@ -30,25 +32,31 @@ class DatabaseProcessor:
         self.total_type_errors = sum(self.type_errors.values())
 
     def print_data_type_errors(self) -> None:
+        """Prints result check_data_type()"""
         self.check_data_type()
         print(f"Type and required field validation: {self.total_type_errors} errors")
         for k, v in self.type_errors.items():
             print(f'{k}: {v}')
 
     def check_format_fields(self) -> None:
-        validation_fields = dict(stop_name=re.compile(r"^([A-Z]\w+ )+(Road|Avenue|Boulevard|Street)$"),
-                                 stop_type=re.compile(r"^[SOF]?$"),
-                                 a_time=re.compile(r"^([01]\d|2[0-3])(:)([0-5]\d)$"))
+        """
+        Checks correctness of format fields: stop_name, stop_type, a_time.
+        stop_name - must consist of two words with a space between them, the first word with a capital letter,
+                    the second can be Road, Avenue, Boulevard or Street.
+        stop_type - must be 'S', 'O','F' or empty string.
+        a_time - must be 24 hours formate, hh:mm.
+        """
+        validation_fields = {'stop_name': re.compile(r"^([A-Z]\w+\s)+(Road|Avenue|Boulevard|Street)$"),
+                             'stop_type': re.compile(r"^[SOF]?$"),
+                             'a_time': re.compile(r"^([01]\d|2[0-3])(:)([0-5]\d)$")}
         for stop in self.database:
             for key, value in stop.items():
                 if key in validation_fields and not validation_fields[key].match(value):
                     self.format_errors[key] += 1
-        # todo try counter
-        self.total_format_errors = 0
-        for err in self.format_errors.values():
-            self.total_format_errors += err
+        self.total_format_errors = sum(self.format_errors.values())
 
     def print_format_fields_errors(self) -> None:
+        """Prints result check_format_fields()"""
         self.check_format_fields()
         print(f"Format validation: {self.total_format_errors} errors")
         for k, v in self.format_errors.items():
@@ -64,6 +72,7 @@ class DatabaseProcessor:
                         [("Sesame Street", "08:37")]},
                 ...}
         """
+        # todo add tests
         for i in self.database:
             bus_id = i['bus_id']
             if bus_id not in self.bus_route_info:
@@ -76,6 +85,7 @@ class DatabaseProcessor:
                 self.bus_route_info[bus_id]["finish"].append(stop_info)
 
     def print_bus_info(self) -> None:
+        """Prints info about buses routes."""
         self.calculate_stops()
         print("Line names and number of stops:")
         for bus_id, stops in self.bus_route_info.items():
@@ -104,6 +114,7 @@ class DatabaseProcessor:
         return sorted(transfer_stops)
 
     def print_stops_info(self) -> None:
+        """Prints info about types of stops."""
         self.calculate_stops()
         start_stops = set()
         finish_stops = set()
@@ -133,7 +144,7 @@ class DatabaseProcessor:
         for bus_name, bus in self.bus_route_info.items():
             previous_time = 0
             for name, time in bus["stops"]:
-                # todo use datetime module for it
+                # todo use datetime module for it read about it
                 hours, minutes = time.split(":")
                 current_time = int(hours) * 60 + int(minutes)
                 if current_time <= previous_time:
@@ -142,6 +153,7 @@ class DatabaseProcessor:
                 previous_time = current_time
 
     def print_time_errors(self) -> None:
+        """Prints result of check_time_errors()"""
         self.check_time_errors()
         print("Arrival time test:")
         if self.time_errors:
