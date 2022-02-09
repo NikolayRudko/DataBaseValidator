@@ -9,9 +9,11 @@ passed to standard input.
 ##Documentation:
 
 ####Diagram of the bus lines:
+
 ![diagram of the bus lines](img/Diagram_of_the_bus_line.jpg)
 
 ####Database specification:
+
 ![documentation](img/Documentation.jpg)
 
 ##Example of input data.
