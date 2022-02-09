@@ -5,7 +5,9 @@ We have a database in json format, the database may contain data in an incorrect
 correctness of the data. We have two documents to verify the data, the first is the **documentation**, the second is
 the **diagram of the bus lines**.We enter a string (we can also use a .json file) containing the data in JSON format,
 passed to standard input.
+
 ##Documentation:
+
 ####Diagram of the bus lines:
 ![diagram of the bus lines](img/Diagram_of_the_bus_line.jpg)
 
