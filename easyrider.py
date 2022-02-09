@@ -21,12 +21,13 @@ def main():
                              "otherwise it will be entered json-string through the console.")
     parser.add_argument("-v", "--verification", choices=actions.keys(),
                         help="Choice type of verification.")
-
     args = parser.parse_args()
+    # input data
     if args.file:
         database_dict = input_database_file(args.file)
     else:
         database_dict = input_database_str()
+    # process data
     db_bus_company = DatabaseProcessor(database_dict)
     action = actions[args.verification]
     action(db_bus_company)
