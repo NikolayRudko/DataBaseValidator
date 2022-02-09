@@ -24,7 +24,7 @@ def main():
 
     args = parser.parse_args()
     if args.file:
-        database_dict = input_database_file("buses.json")
+        database_dict = input_database_file(args.file)
     else:
         database_dict = input_database_str()
     db_bus_company = DatabaseProcessor(database_dict)
