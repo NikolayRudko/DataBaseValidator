@@ -1,18 +1,18 @@
 import json
 
 
-def input_database_str() -> dict:
+def input_database_str() -> list:
     """
     Read json-string from console, and return dict with data
 
     :return: dict with data
     """
-    database = input()
+    database = input("Input json string:")
     database_dict = json.loads(database)
     return database_dict
 
 
-def input_database_file(file_name: str) -> dict:
+def input_database_file(file_name: str) -> list:
     """
     Read *.json file and return dict with data
 

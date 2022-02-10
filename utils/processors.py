@@ -72,16 +72,16 @@ class DatabaseProcessor:
                         [("Sesame Street", "08:37")]},
                 ...}
         """
-        # todo add tests
-        for i in self.database:
-            bus_id = i['bus_id']
+        for stop in self.database:
+            bus_id = stop['bus_id']
+            # todo use get
             if bus_id not in self.bus_route_info:
                 self.bus_route_info[bus_id] = dict(start=[], stops=[], finish=[])
-            stop_info = (i["stop_name"], i["a_time"])
+            stop_info = (stop["stop_name"], stop["a_time"])
             self.bus_route_info[bus_id]["stops"].append(stop_info)
-            if i["stop_type"] == "S":
+            if stop["stop_type"] == "S":
                 self.bus_route_info[bus_id]["start"].append(stop_info)
-            elif i["stop_type"] == "F":
+            elif stop["stop_type"] == "F":
                 self.bus_route_info[bus_id]["finish"].append(stop_info)
 
     def print_bus_info(self) -> None:
@@ -97,8 +97,10 @@ class DatabaseProcessor:
 
         :return: List of transfer stops.
         """
+        # todo add tests
         routes_stops = []
         for stops in self.bus_route_info.values():
+            # todo use generator
             temp = []
             for stop in stops["stops"]:
                 temp.append(stop[0])
@@ -140,6 +142,7 @@ class DatabaseProcessor:
         the program adds an error to the time_errors list and stops checking this route
         and starts checking the next one.
         """
+        # todo add test
         self.calculate_stops()
         for bus_name, bus in self.bus_route_info.items():
             previous_time = 0
@@ -167,8 +170,10 @@ class DatabaseProcessor:
         Are checking the errors if departure points, final stops and transfer stations have attribute -O("On-demand"),
         then adding errors in set errors_stops.
         """
+        # todo add test
         self.calculate_stops()
         transfer_stops = self.find_transfer_stops()
+        # todo use generator
         for i in self.database:
             if i["stop_type"] == "O" and i["stop_name"] in transfer_stops:
                 self.errors_stops.add(i["stop_name"])

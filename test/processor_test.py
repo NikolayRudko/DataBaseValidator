@@ -534,6 +534,92 @@ class DatabaseProcessorTest(TestCase):
         self.assertDictContainsSubset(correct_error_dict, my_processor.format_errors)
         self.assertEqual(my_processor.total_format_errors, 9)
 
+    def test_calculate_stops(self):
+        correct_record = [
+            {
+                "bus_id": 128,
+                "stop_id": 1,
+                "stop_name": "Prospekt Avenue",
+                "next_stop": 3,
+                "stop_type": "S",
+                "a_time": "08:12"
+            },
+            {
+                "bus_id": 128,
+                "stop_id": 3,
+                "stop_name": "Elm Street",
+                "next_stop": 5,
+                "stop_type": "",
+                "a_time": "08:19"
+            },
+            {
+                "bus_id": 128,
+                "stop_id": 5,
+                "stop_name": "Fifth Avenue",
+                "next_stop": 7,
+                "stop_type": "O",
+                "a_time": "08:25"
+            },
+            {
+                "bus_id": 128,
+                "stop_id": 7,
+                "stop_name": "Sesame Street",
+                "next_stop": 0,
+                "stop_type": "F",
+                "a_time": "08:37"
+            },
+            {
+                "bus_id": 512,
+                "stop_id": 4,
+                "stop_name": "Bourbon Street",
+                "next_stop": 6,
+                "stop_type": "S",
+                "a_time": "08:13"
+            },
+            {
+                "bus_id": 512,
+                "stop_id": 6,
+                "stop_name": "Sunset Boulevard",
+                "next_stop": 0,
+                "stop_type": "F",
+                "a_time": "08:16"
+            }
+        ]
+
+        my_processor = DatabaseProcessor(correct_record)
+        correct_bus_route_info = {
+            128: {
+                'start': [
+                    ("Prospekt Avenue", "08:12")
+                ],
+                'stops': [
+                    ("Prospekt Avenue", "08:12"),
+                    ("Elm Street", "08:19"),
+                    ("Fifth Avenue", "08:25"),
+                    ("Sesame Street", "08:37")
+                ],
+                'finish': [
+                    ("Sesame Street", "08:37")
+                ]
+            },
+            512: {
+                'start': [
+                    ("Bourbon Street", "08:13")
+                ],
+                'stops': [
+                    ("Bourbon Street", "08:13"), ("Sunset Boulevard", "08:16")
+                ],
+                'finish': [
+                    ("Sunset Boulevard", "08:16")
+                ]
+            }
+
+        }
+
+        my_processor.calculate_stops()
+
+        self.assertDictContainsSubset(correct_bus_route_info, my_processor.bus_route_info)
+
 
 if __name__ == "__main__":
     main()
