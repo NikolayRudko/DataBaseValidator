@@ -74,15 +74,13 @@ class DatabaseProcessor:
         """
         for stop in self.database:
             bus_id = stop['bus_id']
-            # todo use get
-            if bus_id not in self.bus_route_info:
-                self.bus_route_info[bus_id] = dict(start=[], stops=[], finish=[])
+            bus = self.bus_route_info.setdefault(bus_id, dict(start=[], stops=[], finish=[]))
             stop_info = (stop["stop_name"], stop["a_time"])
-            self.bus_route_info[bus_id]["stops"].append(stop_info)
+            bus["stops"].append(stop_info)
             if stop["stop_type"] == "S":
-                self.bus_route_info[bus_id]["start"].append(stop_info)
+                bus["start"].append(stop_info)
             elif stop["stop_type"] == "F":
-                self.bus_route_info[bus_id]["finish"].append(stop_info)
+                bus["finish"].append(stop_info)
 
     def print_bus_info(self) -> None:
         """Prints info about buses routes."""
