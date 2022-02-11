@@ -84,6 +84,7 @@ class DatabaseProcessor:
 
     def print_bus_info(self) -> None:
         """Prints info about buses routes."""
+        # todo read about @property
         self.calculate_stops()
         print("Line names and number of stops:")
         for bus_id, stops in self.bus_route_info.items():
@@ -95,7 +96,6 @@ class DatabaseProcessor:
 
         :return: List of transfer stops.
         """
-        # todo add tests
         routes_stops = []
         for stops in self.bus_route_info.values():
             # todo use generator
