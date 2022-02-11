@@ -1,4 +1,5 @@
 import re
+from collections import Counter
 
 
 class DatabaseProcessor:
@@ -96,22 +97,13 @@ class DatabaseProcessor:
 
         :return: List of transfer stops.
         """
+        # todo try generator
         routes_stops = []
         for stops in self.bus_route_info.values():
-            # todo use generator
-            temp = []
             for stop in stops["stops"]:
-                temp.append(stop[0])
-            routes_stops.append(temp)
-        # If the bus_route_info dictionary is empty or only one route exists.
-        if len(routes_stops) <= 1:
-            return []
-        # todo find short solution, maybe the Counter will be better
-        transfer_stops = set()
-        for i in range(0, len(routes_stops) - 1):
-            for j in range(i + 1, len(routes_stops)):
-                transfer_stops.update(set(routes_stops[i]) & set(routes_stops[j]))
-        return sorted(transfer_stops)
+                routes_stops.append(stop[0])
+        stop_frequency = Counter(routes_stops).most_common()
+        return sorted([stop[0] for stop in stop_frequency if stop[1] > 1])
 
     def print_stops_info(self) -> None:
         """Prints info about types of stops."""
