@@ -132,16 +132,14 @@ class DatabaseProcessor:
         the program adds an error to the time_errors list and stops checking this route
         and starts checking the next one.
         """
-        # todo add test
         self.calculate_stops()
-        for bus_name, bus in self.bus_route_info.items():
+        for bus_id, bus in self.bus_route_info.items():
             previous_time = 0
-            for name, time in bus["stops"]:
-                # todo use datetime module for it read about it
+            for stop_name, time in bus["stops"]:
                 hours, minutes = time.split(":")
                 current_time = int(hours) * 60 + int(minutes)
                 if current_time <= previous_time:
-                    self.time_errors.append((bus_name, name))
+                    self.time_errors.append((bus_id, stop_name))
                     break
                 previous_time = current_time
 
