@@ -165,7 +165,4 @@ class DatabaseProcessor:
         """
         self.check_demand_errors()
         print("On demand stops test:")
-        if self.errors_stops:
-            print("Wrong stop type: {0}".format(sorted(self.errors_stops)))
-        else:
-            print("OK")
+        print("Wrong stop type: {0}".format(sorted(self.errors_stops)) if self.errors_stops else "OK")
