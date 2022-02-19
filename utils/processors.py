@@ -97,13 +97,10 @@ class DatabaseProcessor:
 
         :return: List of transfer stops.
         """
-        # todo try generator
-        routes_stops = []
-        for stops in self.bus_route_info.values():
-            for stop in stops["stops"]:
-                routes_stops.append(stop[0])
+        routes_stops = [stop[0] for stops in self.bus_route_info.values() for stop in stops["stops"]]
         stop_frequency = Counter(routes_stops).most_common()
-        return sorted([stop[0] for stop in stop_frequency if stop[1] > 1])
+        transfer_stops = sorted([stop[0] for stop in stop_frequency if stop[1] > 1])
+        return transfer_stops
 
     def print_stops_info(self) -> None:
         """Prints info about types of stops."""
@@ -115,9 +112,6 @@ class DatabaseProcessor:
                 print(f'There is no start or end stop for the line: {bus_id}.')
                 break
             else:
-                # todo try:
-                # start_stops.update(stops["start"])
-                # finish_stops.update(stops["finish"])
                 start_stops.update([i[0] for i in stops["start"]])
                 finish_stops.update([i[0] for i in stops["finish"]])
         else:
@@ -160,7 +154,6 @@ class DatabaseProcessor:
         """
         self.calculate_stops()
         transfer_stops = self.find_transfer_stops()
-        # todo use generator
         for i in self.database:
             if i["stop_type"] == "O" and i["stop_name"] in transfer_stops:
                 self.errors_stops.add(i["stop_name"])
