@@ -712,7 +712,7 @@ class DatabaseProcessorTest(TestCase):
 
         self.assertListEqual(answer, correct_transfer_list)
 
-    def test_find_time_errors_without_errors(self):
+    def test_find_time_errors_with_correct_data(self):
         """Check DatabaseProcessor.check_time_errors() with correct data."""
         db = [
             {
@@ -735,7 +735,7 @@ class DatabaseProcessorTest(TestCase):
         my_processor = DatabaseProcessor(db)
         my_processor.check_time_errors()
 
-        self.assertListEqual(my_processor.time_errors, [])
+        self.assertFalse(my_processor.time_errors)
 
     def test_find_time_errors(self):
         """Check DatabaseProcessor.check_time_errors() with wrong data."""
@@ -826,6 +826,121 @@ class DatabaseProcessorTest(TestCase):
         correct_error_list = [(128, "Fifth Avenue"), (256, "Sunset Boulevard")]
 
         self.assertListEqual(my_processor.time_errors, correct_error_list)
+
+    def test_find_demand_errors_with_correct_data(self):
+        """Check DatabaseProcessor.check_demand_errors() with correct data."""
+        db = [
+            {
+                "bus_id": 512,
+                "stop_id": 4,
+                "stop_name": "Bourbon Street",
+                "next_stop": 6,
+                "stop_type": "S",
+                "a_time": "08:13"
+            },
+            {
+                "bus_id": 512,
+                "stop_id": 6,
+                "stop_name": "Sunset Boulevard",
+                "next_stop": 0,
+                "stop_type": "F",
+                "a_time": "08:16"
+            }
+        ]
+        my_processor = DatabaseProcessor(db)
+        my_processor.check_demand_errors()
+
+        self.assertFalse(my_processor.errors_stops)
+
+    def test_find_demand_errors(self):
+        """Check DatabaseProcessor.check_demand_errors() with wrong data."""
+        db = [
+            {
+                "bus_id": 128,
+                "stop_id": 1,
+                "stop_name": "Prospekt Avenue",
+                "next_stop": 3,
+                "stop_type": "S",
+                "a_time": "08:12"
+            },
+            {
+                "bus_id": 128,
+                "stop_id": 3,
+                "stop_name": "Elm Street",
+                "next_stop": 5,
+                "stop_type": "O",
+                "a_time": "08:19"
+            },
+            {
+                "bus_id": 128,
+                "stop_id": 5,
+                "stop_name": "Fifth Avenue",
+                "next_stop": 7,
+                "stop_type": "O",
+                "a_time": "08:25"
+            },
+            {
+                "bus_id": 128,
+                "stop_id": 7,
+                "stop_name": "Sesame Street",
+                "next_stop": 0,
+                "stop_type": "F",
+                "a_time": "08:37"
+            },
+            {
+                "bus_id": 256,
+                "stop_id": 2,
+                "stop_name": "Pilotow Street",
+                "next_stop": 3,
+                "stop_type": "S",
+                "a_time": "09:20"
+            },
+            {
+                "bus_id": 256,
+                "stop_id": 3,
+                "stop_name": "Elm Street",
+                "next_stop": 6,
+                "stop_type": "",
+                "a_time": "09:45"
+            },
+            {
+                "bus_id": 256,
+                "stop_id": 6,
+                "stop_name": "Sunset Boulevard",
+                "next_stop": 7,
+                "stop_type": "O",
+                "a_time": "09:59"
+            },
+            {
+                "bus_id": 256,
+                "stop_id": 7,
+                "stop_name": "Sesame Street",
+                "next_stop": 0,
+                "stop_type": "F",
+                "a_time": "10:12"
+            },
+            {
+                "bus_id": 512,
+                "stop_id": 4,
+                "stop_name": "Bourbon Street",
+                "next_stop": 6,
+                "stop_type": "S",
+                "a_time": "08:13"
+            },
+            {
+                "bus_id": 512,
+                "stop_id": 6,
+                "stop_name": "Sunset Boulevard",
+                "next_stop": 0,
+                "stop_type": "F",
+                "a_time": "08:16"
+            }
+        ]
+        my_processor = DatabaseProcessor(db)
+        my_processor.check_demand_errors()
+        correct_error_list = {'Sunset Boulevard', 'Elm Street'}
+
+        self.assertSetEqual(my_processor.errors_stops, correct_error_list)
 
 
 if __name__ == "__main__":

@@ -158,7 +158,6 @@ class DatabaseProcessor:
         Are checking the errors if departure points, final stops and transfer stations have attribute -O("On-demand"),
         then adding errors in set errors_stops.
         """
-        # todo add test
         self.calculate_stops()
         transfer_stops = self.find_transfer_stops()
         # todo use generator
