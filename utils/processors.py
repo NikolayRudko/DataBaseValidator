@@ -97,15 +97,18 @@ class DatabaseProcessor:
                     bus["start"].append(stop_info)
                 elif stop["stop_type"] == "F":
                     bus["finish"].append(stop_info)
-        except ProcessorError as e:
+        except ProcessorError:
             raise
 
     def print_bus_info(self) -> None:
         """Prints info about buses routes."""
-        self.calculate_stops()
-        print("Line names and number of stops:")
-        for bus_id, stops in self.bus_route_info.items():
-            print(f'bus_id: {bus_id}, stops: {len(stops["stops"])}')
+        try:
+            self.calculate_stops()
+            print("Line names and number of stops:")
+            for bus_id, stops in self.bus_route_info.items():
+                print(f'bus_id: {bus_id}, stops: {len(stops["stops"])}')
+        except ProcessorError:
+            raise
 
     def find_transfer_stops(self) -> list:
         """
@@ -120,21 +123,24 @@ class DatabaseProcessor:
 
     def print_stops_info(self) -> None:
         """Prints info about types of stops."""
-        self.calculate_stops()
-        start_stops = set()
-        finish_stops = set()
-        for bus_id, stops in self.bus_route_info.items():
-            if len(stops['start']) != 1 or len(stops["finish"]) != 1:
-                print(f'There is no start or end stop for the line: {bus_id}.')
-                break
+        try:
+            self.calculate_stops()
+            start_stops = set()
+            finish_stops = set()
+            for bus_id, stops in self.bus_route_info.items():
+                if len(stops['start']) != 1 or len(stops["finish"]) != 1:
+                    print(f'There is no start or end stop for the line: {bus_id}.')
+                    break
+                else:
+                    start_stops.update([i[0] for i in stops["start"]])
+                    finish_stops.update([i[0] for i in stops["finish"]])
             else:
-                start_stops.update([i[0] for i in stops["start"]])
-                finish_stops.update([i[0] for i in stops["finish"]])
-        else:
-            print(f'Start stops: {len(start_stops)} {sorted(start_stops)}')
-            transfer_stops = self.find_transfer_stops()
-            print(f'Transfer stops: {len(transfer_stops)} {transfer_stops}')
-            print(f'Finish stops: {len(finish_stops)} {sorted(finish_stops)}')
+                print(f'Start stops: {len(start_stops)} {sorted(start_stops)}')
+                transfer_stops = self.find_transfer_stops()
+                print(f'Transfer stops: {len(transfer_stops)} {transfer_stops}')
+                print(f'Finish stops: {len(finish_stops)} {sorted(finish_stops)}')
+        except ProcessorError:
+            raise
 
     def check_time_errors(self) -> None:
         """
@@ -142,43 +148,55 @@ class DatabaseProcessor:
         the program adds an error to the time_errors list and stops checking this route
         and starts checking the next one.
         """
-        self.calculate_stops()
-        for bus_id, bus in self.bus_route_info.items():
-            previous_time = 0
-            for stop_name, time in bus["stops"]:
-                hours, minutes = time.split(":")
-                current_time = int(hours) * 60 + int(minutes)
-                if current_time <= previous_time:
-                    self.time_errors.append((bus_id, stop_name))
-                    break
-                previous_time = current_time
+        try:
+            self.calculate_stops()
+            for bus_id, bus in self.bus_route_info.items():
+                previous_time = 0
+                for stop_name, time in bus["stops"]:
+                    hours, minutes = time.split(":")
+                    current_time = int(hours) * 60 + int(minutes)
+                    if current_time <= previous_time:
+                        self.time_errors.append((bus_id, stop_name))
+                        break
+                    previous_time = current_time
+        except ProcessorError:
+            raise
 
     def print_time_errors(self) -> None:
         """Prints result of check_time_errors()"""
-        self.check_time_errors()
-        print("Arrival time test:")
-        if self.time_errors:
-            for bus, stop in self.time_errors:
-                print(f"bus_id line {bus}: wrong time on station {stop}")
-        else:
-            print("OK")
+        try:
+            self.check_time_errors()
+            print("Arrival time test:")
+            if self.time_errors:
+                for bus, stop in self.time_errors:
+                    print(f"bus_id line {bus}: wrong time on station {stop}")
+            else:
+                print("OK")
+        except ProcessorError:
+            raise
 
     def check_demand_errors(self) -> None:
         """
         Are checking the errors if departure points, final stops and transfer stations have attribute -O("On-demand"),
         then adding errors in set errors_stops.
         """
-        self.calculate_stops()
-        transfer_stops = self.find_transfer_stops()
-        for i in self.database:
-            if i["stop_type"] == "O" and i["stop_name"] in transfer_stops:
-                self.errors_stops.add(i["stop_name"])
+        try:
+            self.calculate_stops()
+            transfer_stops = self.find_transfer_stops()
+            for i in self.database:
+                if i["stop_type"] == "O" and i["stop_name"] in transfer_stops:
+                    self.errors_stops.add(i["stop_name"])
+        except ProcessorError:
+            raise
 
     def print_demand_errors(self) -> None:
         """
         Are printing the errors if departure points, final stops and transfer stations have attribute -O("On-demand").
         The errors are also sorted alphabetically.
         """
-        self.check_demand_errors()
-        print("On demand stops test:")
-        print("Wrong stop type: {0}".format(sorted(self.errors_stops)) if self.errors_stops else "OK")
+        try:
+            self.check_demand_errors()
+            print("On demand stops test:")
+            print("Wrong stop type: {0}".format(sorted(self.errors_stops)) if self.errors_stops else "OK")
+        except ProcessorError:
+            raise
