@@ -79,7 +79,7 @@ class DatabaseProcessor:
         """
         try:
             self.check_data_type()
-            if self.type_errors:
+            if self.total_type_errors:
                 raise DataTypeProcessorError
 
             for stop in self.database:
