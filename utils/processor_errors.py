@@ -15,3 +15,7 @@ class ProcessorError(Exception):
 
 class DataTypeProcessorError(ProcessorError):
     pass
+
+
+class FormatFieldsProcessorError(ProcessorError):
+    pass

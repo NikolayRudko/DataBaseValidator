@@ -2,14 +2,16 @@ import re
 from collections import Counter
 
 from utils.processor_errors import ProcessorError
+
 from utils.processor_errors import DataTypeProcessorError
+from utils.processor_errors import FormatFieldsProcessorError
 
 
 class DatabaseProcessor:
     def __init__(self, database):
         self.database = database
         self.type_errors = dict(bus_id=0, stop_id=0, stop_name=0, next_stop=0, stop_type=0, a_time=0)
-        #todo property
+        # todo property
         self.total_type_errors = 0
         self.format_errors = dict(stop_name=0, stop_type=0, a_time=0)
         self.total_format_errors = 0
@@ -81,6 +83,10 @@ class DatabaseProcessor:
             self.check_data_type()
             if self.total_type_errors:
                 raise DataTypeProcessorError
+
+            self.check_format_fields()
+            if self.total_format_errors:
+                raise FormatFieldsProcessorError
 
             for stop in self.database:
                 bus_id = stop['bus_id']
