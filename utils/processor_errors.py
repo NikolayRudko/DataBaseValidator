@@ -11,3 +11,7 @@ class ProcessorError(Exception):
             return '{}, {} '.format(self.__name__, self.message)
         else:
             return '{} has been raised'.format(self.__name__)
+
+
+class DataTypeProcessorError(ProcessorError):
+    pass

@@ -1,11 +1,15 @@
 import re
 from collections import Counter
 
+from utils.processor_errors import ProcessorError
+from utils.processor_errors import DataTypeProcessorError
+
 
 class DatabaseProcessor:
     def __init__(self, database):
         self.database = database
         self.type_errors = dict(bus_id=0, stop_id=0, stop_name=0, next_stop=0, stop_type=0, a_time=0)
+        #todo property
         self.total_type_errors = 0
         self.format_errors = dict(stop_name=0, stop_type=0, a_time=0)
         self.total_format_errors = 0
@@ -73,15 +77,22 @@ class DatabaseProcessor:
                         [("Sesame Street", "08:37")]},
                 ...}
         """
-        for stop in self.database:
-            bus_id = stop['bus_id']
-            bus = self.bus_route_info.setdefault(bus_id, dict(start=[], stops=[], finish=[]))
-            stop_info = (stop["stop_name"], stop["a_time"])
-            bus["stops"].append(stop_info)
-            if stop["stop_type"] == "S":
-                bus["start"].append(stop_info)
-            elif stop["stop_type"] == "F":
-                bus["finish"].append(stop_info)
+        try:
+            self.check_data_type()
+            if self.type_errors:
+                raise DataTypeProcessorError
+
+            for stop in self.database:
+                bus_id = stop['bus_id']
+                bus = self.bus_route_info.setdefault(bus_id, dict(start=[], stops=[], finish=[]))
+                stop_info = (stop["stop_name"], stop["a_time"])
+                bus["stops"].append(stop_info)
+                if stop["stop_type"] == "S":
+                    bus["start"].append(stop_info)
+                elif stop["stop_type"] == "F":
+                    bus["finish"].append(stop_info)
+        except ProcessorError as e:
+            raise
 
     def print_bus_info(self) -> None:
         """Prints info about buses routes."""
