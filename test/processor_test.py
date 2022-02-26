@@ -1,7 +1,7 @@
 from unittest import TestCase, main
 from utils.processors import DatabaseProcessor
 from utils.processor_errors import DataTypeProcessorError
-from utils.processor_errors import ProcessorError
+from utils.processor_errors import FormatFieldsProcessorError
 
 
 class DatabaseProcessorTest(TestCase):
@@ -638,6 +638,22 @@ class DatabaseProcessorTest(TestCase):
         my_processor = DatabaseProcessor(correct_record)
 
         self.assertRaises(DataTypeProcessorError, my_processor.calculate_stops)
+
+    def test_calculate_stops_with_FormatFieldsProcessorError_stop_name(self):
+        """Checking DatabaseProcessor.calculate_stops with broken format field 'stop_name' """
+        correct_record = [
+            {
+                "bus_id": 128,
+                "stop_id": 1,
+                "stop_name": "Prospekt Av",
+                "next_stop": 3,
+                "stop_type": "S",
+                "a_time": "08:12"
+            }
+        ]
+        my_processor = DatabaseProcessor(correct_record)
+
+        self.assertRaises(FormatFieldsProcessorError, my_processor.calculate_stops)
 
     def test_find_transfer_stops(self):
         """Check converting database to list transfer stops."""
