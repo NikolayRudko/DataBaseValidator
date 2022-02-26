@@ -7,7 +7,7 @@ from utils.processor_errors import FormatFieldsProcessorError
 class DatabaseProcessorTest(TestCase):
     """Test for DatabaseProcessor"""
 
-    def test_find_bus_id_data_type_error(self):
+    def test_find_bus_type_errors(self):
         """Check add error in  'bus_id'"""
         wrong_id_record = [{"bus_id": "128",
                             "stop_id": 1,
@@ -15,16 +15,66 @@ class DatabaseProcessorTest(TestCase):
                             "next_stop": 3,
                             "stop_type": "S",
                             "a_time": "8:12"
-                            }]
+                            },
+                           {"bus_id": 128,
+                            "stop_id": "1",
+                            "stop_name": "Prospekt Avenue",
+                            "next_stop": 3,
+                            "stop_type": "S",
+                            "a_time": "8:12"
+                            },
+                           {"bus_id": 128,
+                            "stop_id": 1,
+                            "stop_name": 0,
+                            "next_stop": 3,
+                            "stop_type": "S",
+                            "a_time": "8:12"
+                            },
+                           {"bus_id": 128,
+                            "stop_id": 1,
+                            "stop_name": "Prospekt Avenue",
+                            "next_stop": "3",
+                            "stop_type": "S",
+                            "a_time": "8:12"
+                            },
+                           {"bus_id": 128,
+                            "stop_id": 1,
+                            "stop_name": "Prospekt Avenue",
+                            "next_stop": 3,
+                            "stop_type": 0,
+                            "a_time": "8:12"
+                            },
+                           {"bus_id": 128,
+                            "stop_id": 1,
+                            "stop_name": "Prospekt Avenue",
+                            "next_stop": 3,
+                            "stop_type": "",
+                            "a_time": 8.12
+                            },
+                           {"bus_id": 128,
+                            "stop_id": 1,
+                            "stop_name": "",
+                            "next_stop": 3,
+                            "stop_type": "S",
+                            "a_time": "8:12"
+                            },
+                           {"bus_id": 128,
+                            "stop_id": 1,
+                            "stop_name": "Prospekt Avenue",
+                            "next_stop": 3,
+                            "stop_type": "S",
+                            "a_time": ""
+                            }
+                           ]
         my_processor = DatabaseProcessor(wrong_id_record)
         my_processor.check_data_type()
 
-        right_dict = dict(bus_id=1, stop_id=0, stop_name=0, next_stop=0, stop_type=0, a_time=0)
+        right_dict = dict(bus_id=1, stop_id=1, stop_name=2, next_stop=1, stop_type=1, a_time=2)
 
         self.assertDictContainsSubset(right_dict, my_processor.type_errors)
 
         # self.assertEqual(my_processor.type_errors, my_processor.type_errors | right_dict)
-        self.assertEqual(my_processor.total_type_errors, 1)
+        self.assertEqual(my_processor.total_type_errors, 8)
 
     def test_data_without_type_error(self):
         """Check 'bus_id' without errors."""
@@ -42,141 +92,6 @@ class DatabaseProcessorTest(TestCase):
 
         self.assertDictContainsSubset(right_dict, my_processor.type_errors)
         self.assertEqual(my_processor.total_type_errors, 0)
-
-    def test_find_stop_id_data_type_error(self):
-        """Check add error in 'stop_id'"""
-        wrong_id_record = [{"bus_id": 128,
-                            "stop_id": "1",
-                            "stop_name": "Prospekt Avenue",
-                            "next_stop": 3,
-                            "stop_type": "S",
-                            "a_time": "8:12"
-                            }]
-        my_processor = DatabaseProcessor(wrong_id_record)
-        my_processor.check_data_type()
-
-        right_dict = dict(bus_id=0, stop_id=1, stop_name=0, next_stop=0, stop_type=0, a_time=0)
-
-        self.assertDictContainsSubset(right_dict, my_processor.type_errors)
-        self.assertEqual(my_processor.total_type_errors, 1)
-
-    def test_find_stop_name_data_type_error(self):
-        """Check add error in 'stop_name'"""
-        wrong_id_record = [{"bus_id": 128,
-                            "stop_id": 1,
-                            "stop_name": 0,
-                            "next_stop": 3,
-                            "stop_type": "S",
-                            "a_time": "8:12"
-                            }]
-        my_processor = DatabaseProcessor(wrong_id_record)
-        my_processor.check_data_type()
-
-        right_dict = dict(bus_id=0, stop_id=0, stop_name=1, next_stop=0, stop_type=0, a_time=0)
-
-        self.assertDictContainsSubset(right_dict, my_processor.type_errors)
-        self.assertEqual(my_processor.total_type_errors, 1)
-
-    def test_find_next_stop_data_type_error(self):
-        """Check add error in 'next_stop'"""
-        wrong_id_record = [{"bus_id": 128,
-                            "stop_id": 1,
-                            "stop_name": "Prospekt Avenue",
-                            "next_stop": "3",
-                            "stop_type": "S",
-                            "a_time": "8:12"
-                            }]
-        my_processor = DatabaseProcessor(wrong_id_record)
-        my_processor.check_data_type()
-
-        right_dict = dict(bus_id=0, stop_id=0, stop_name=0, next_stop=1, stop_type=0, a_time=0)
-
-        self.assertDictContainsSubset(right_dict, my_processor.type_errors)
-        self.assertEqual(my_processor.total_type_errors, 1)
-
-    def test_find_stop_type_data_type_error(self):
-        """Check add error in 'stop_type'"""
-        wrong_id_record = [{"bus_id": 128,
-                            "stop_id": 1,
-                            "stop_name": "Prospekt Avenue",
-                            "next_stop": 3,
-                            "stop_type": 0,
-                            "a_time": "8:12"
-                            }]
-        my_processor = DatabaseProcessor(wrong_id_record)
-        my_processor.check_data_type()
-
-        right_dict = dict(bus_id=0, stop_id=0, stop_name=0, next_stop=0, stop_type=1, a_time=0)
-
-        self.assertDictContainsSubset(right_dict, my_processor.type_errors)
-        self.assertEqual(my_processor.total_type_errors, 1)
-
-    def test_find_a_time_data_type_error(self):
-        """Check add error in 'a_time'"""
-        wrong_id_record = [{"bus_id": 128,
-                            "stop_id": 1,
-                            "stop_name": "Prospekt Avenue",
-                            "next_stop": 3,
-                            "stop_type": "",
-                            "a_time": 8.12
-                            }]
-        my_processor = DatabaseProcessor(wrong_id_record)
-        my_processor.check_data_type()
-
-        right_dict = dict(bus_id=0, stop_id=0, stop_name=0, next_stop=0, stop_type=0, a_time=1)
-
-        self.assertDictContainsSubset(right_dict, my_processor.type_errors)
-        self.assertEqual(my_processor.total_type_errors, 1)
-
-    def test_find_stop_name_empty_field_error(self):
-        """Check add error in 'stop_name'"""
-        wrong_id_record = [{"bus_id": 128,
-                            "stop_id": 1,
-                            "stop_name": "",
-                            "next_stop": 3,
-                            "stop_type": "S",
-                            "a_time": "8:12"
-                            }]
-        my_processor = DatabaseProcessor(wrong_id_record)
-        my_processor.check_data_type()
-
-        right_dict = dict(bus_id=0, stop_id=0, stop_name=1, next_stop=0, stop_type=0, a_time=0)
-
-        self.assertDictContainsSubset(right_dict, my_processor.type_errors)
-        self.assertEqual(my_processor.total_type_errors, 1)
-
-    def test_find_a_time_empty_field_error(self):
-        """Check add error in 'a_time'"""
-        wrong_id_record = [{"bus_id": 128,
-                            "stop_id": 1,
-                            "stop_name": "Prospekt Avenue",
-                            "next_stop": 3,
-                            "stop_type": "",
-                            "a_time": ""
-                            }]
-        my_processor = DatabaseProcessor(wrong_id_record)
-        my_processor.check_data_type()
-
-        right_dict = dict(bus_id=0, stop_id=0, stop_name=0, next_stop=0, stop_type=0, a_time=1)
-
-        self.assertDictContainsSubset(right_dict, my_processor.type_errors)
-        self.assertEqual(my_processor.total_type_errors, 1)
-
-    def test_find_stop_type_format_type_error(self):
-        """Check add error in 'stop_type'"""
-        wrong_id_record = [{"bus_id": 128,
-                            "stop_id": 1,
-                            "stop_name": "Prospekt Avenue",
-                            "next_stop": 3,
-                            "stop_type": 0,
-                            "a_time": "8:12"
-                            }]
-        my_processor = DatabaseProcessor(wrong_id_record)
-        my_processor.check_data_type()
-
-        right_dict = dict(bus_id=0, stop_id=0, stop_name=0, next_stop=0, stop_type=1, a_time=0)
-
-        self.assertDictContainsSubset(right_dict, my_processor.type_errors)
 
     def test_find_total_type_errors(self):
         """Check total_type"""
