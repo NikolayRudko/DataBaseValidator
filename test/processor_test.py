@@ -20,7 +20,7 @@ class DatabaseProcessorTest(TestCase):
         right_dict = dict(bus_id=1, stop_id=0, stop_name=0, next_stop=0, stop_type=0, a_time=0)
 
         self.assertDictContainsSubset(right_dict, my_processor.type_errors)
-        # todo read more
+
         # self.assertEqual(my_processor.type_errors, my_processor.type_errors | right_dict)
         self.assertEqual(my_processor.total_type_errors, 1)
 

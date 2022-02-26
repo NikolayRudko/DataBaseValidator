@@ -2,6 +2,7 @@ import argparse
 
 from utils import input_database_file, input_database_str
 from utils.processors import DatabaseProcessor
+from utils.processor_errors import ProcessorError
 
 
 def main():
@@ -30,7 +31,10 @@ def main():
     # process data
     db_bus_company = DatabaseProcessor(database_dict)
     action = actions[args.verification]
-    action(db_bus_company)
+    try:
+        action(db_bus_company)
+    except ProcessorError as e:
+        print(e)
 
 
 if __name__ == "__main__":
