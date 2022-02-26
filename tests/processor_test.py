@@ -442,7 +442,7 @@ class DatabaseProcessorTest(TestCase):
 
         }
 
-        my_processor.calculate_stops()
+        my_processor._calculate_stops()
 
         self.assertDictContainsSubset(correct_bus_route_info, my_processor._bus_route_info)
 
@@ -460,7 +460,7 @@ class DatabaseProcessorTest(TestCase):
         ]
         my_processor = DatabaseProcessor(correct_record)
 
-        self.assertRaises(DataTypeProcessorError, my_processor.calculate_stops)
+        self.assertRaises(DataTypeProcessorError, my_processor._calculate_stops)
 
     def test_calculate_stops_with_FormatFieldsProcessorError_stop_name(self):
         """Checking DatabaseProcessor.calculate_stops with broken format field 'stop_name' """
@@ -476,7 +476,7 @@ class DatabaseProcessorTest(TestCase):
         ]
         my_processor = DatabaseProcessor(correct_record)
 
-        self.assertRaises(FormatFieldsProcessorError, my_processor.calculate_stops)
+        self.assertRaises(FormatFieldsProcessorError, my_processor._calculate_stops)
 
     def test_find_transfer_stops(self):
         """Check converting database to list transfer stops."""
@@ -564,7 +564,7 @@ class DatabaseProcessorTest(TestCase):
         ]
         correct_transfer_list = ["Elm Street", "Sesame Street", "Sunset Boulevard"]
         my_processor = DatabaseProcessor(db)
-        my_processor.calculate_stops()
+        my_processor._calculate_stops()
         answer = my_processor._find_transfer_stops()
 
         self.assertListEqual(answer, correct_transfer_list)

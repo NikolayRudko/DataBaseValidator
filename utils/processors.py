@@ -12,7 +12,6 @@ class DatabaseProcessor:
     def __init__(self, database):
         self._database = database
         self._type_errors = dict(bus_id=0, stop_id=0, stop_name=0, next_stop=0, stop_type=0, a_time=0)
-        # todo property
         self._total_type_errors = 0
         self._format_errors = dict(stop_name=0, stop_type=0, a_time=0)
         self._total_format_errors = 0
@@ -70,7 +69,7 @@ class DatabaseProcessor:
         for k, v in self._format_errors.items():
             print(f'{k}: {v}')
 
-    def calculate_stops(self) -> None:
+    def _calculate_stops(self) -> None:
         """
         Are processing database, then creating dict bus_route_info with information about start, final
         and intermediate stops.
@@ -104,7 +103,8 @@ class DatabaseProcessor:
     def print_bus_info(self) -> None:
         """Prints info about buses routes."""
         try:
-            self.calculate_stops()
+            if not self._bus_route_info:
+                self._calculate_stops()
             print("Line names and number of stops:")
             for bus_id, stops in self._bus_route_info.items():
                 print(f'bus_id: {bus_id}, stops: {len(stops["stops"])}')
@@ -117,6 +117,8 @@ class DatabaseProcessor:
 
         :return: List of transfer stops.
         """
+        if not self._bus_route_info:
+            self._calculate_stops()
         routes_stops = [stop[0] for stops in self._bus_route_info.values() for stop in stops["stops"]]
         stop_frequency = Counter(routes_stops).most_common()
         transfer_stops = sorted([stop[0] for stop in stop_frequency if stop[1] > 1])
@@ -125,7 +127,8 @@ class DatabaseProcessor:
     def print_stops_info(self) -> None:
         """Prints info about types of stops."""
         try:
-            self.calculate_stops()
+            if not self._bus_route_info:
+                self._calculate_stops()
             start_stops = set()
             finish_stops = set()
             for bus_id, stops in self._bus_route_info.items():
@@ -150,7 +153,8 @@ class DatabaseProcessor:
         and starts checking the next one.
         """
         try:
-            self.calculate_stops()
+            if not self._bus_route_info:
+                self._calculate_stops()
             for bus_id, bus in self._bus_route_info.items():
                 previous_time = 0
                 for stop_name, time in bus["stops"]:
@@ -182,10 +186,11 @@ class DatabaseProcessor:
         then adding errors in set errors_stops.
         """
         try:
-            self._check_arrival_time_errors()
-            if self._arrival_time_errors:
-                raise ArrivalTimeProcessorError
-            self.calculate_stops()
+            # todo fix it
+            # self._check_arrival_time_errors()
+            # if self._arrival_time_errors:
+            #     raise ArrivalTimeProcessorError
+            self._calculate_stops()
             transfer_stops = self._find_transfer_stops()
             for i in self._database:
                 if i["stop_type"] == "O" and i["stop_name"] in transfer_stops:
