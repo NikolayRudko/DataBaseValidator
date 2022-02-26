@@ -590,9 +590,9 @@ class DatabaseProcessorTest(TestCase):
             }
         ]
         my_processor = DatabaseProcessor(db)
-        my_processor._check_time_errors()
+        my_processor._check_arrival_time_errors()
 
-        self.assertFalse(my_processor._time_errors)
+        self.assertFalse(my_processor._arrival_time_errors)
 
     def test_find_time_errors(self):
         """Check DatabaseProcessor.check_time_errors() with wrong data."""
@@ -679,10 +679,10 @@ class DatabaseProcessorTest(TestCase):
             }
         ]
         my_processor = DatabaseProcessor(db)
-        my_processor._check_time_errors()
+        my_processor._check_arrival_time_errors()
         correct_error_list = [(128, "Fifth Avenue"), (256, "Sunset Boulevard")]
 
-        self.assertListEqual(my_processor._time_errors, correct_error_list)
+        self.assertListEqual(my_processor._arrival_time_errors, correct_error_list)
 
     def test_find_demand_errors_with_correct_data(self):
         """Check DatabaseProcessor.check_demand_errors() with correct data."""

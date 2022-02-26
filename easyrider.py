@@ -12,7 +12,7 @@ def main():
         "format_fields": DatabaseProcessor.print_format_fields_errors,
         "bus_info": DatabaseProcessor.print_bus_info,
         "stops_info": DatabaseProcessor.print_stops_info,
-        "time_errors": DatabaseProcessor.print_time_errors,
+        "time_errors": DatabaseProcessor.print_arrival_time_errors,
         "demand_errors": DatabaseProcessor.print_demand_errors
     }
 

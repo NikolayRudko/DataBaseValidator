@@ -5,6 +5,7 @@ from utils.processor_errors import ProcessorError
 
 from utils.processor_errors import DataTypeProcessorError
 from utils.processor_errors import FormatFieldsProcessorError
+from utils.processor_errors import ArrivalTimeProcessorError
 
 
 class DatabaseProcessor:
@@ -16,7 +17,7 @@ class DatabaseProcessor:
         self._format_errors = dict(stop_name=0, stop_type=0, a_time=0)
         self._total_format_errors = 0
         self._bus_route_info = {}
-        self._time_errors = []
+        self._arrival_time_errors = []
         self._errors_stops = set()
 
     def _check_data_type(self) -> None:
@@ -142,7 +143,7 @@ class DatabaseProcessor:
         except ProcessorError:
             raise
 
-    def _check_time_errors(self) -> None:
+    def _check_arrival_time_errors(self) -> None:
         """
         Checks the time on the route, if the time of the next station is less or more than the previous one,
         the program adds an error to the time_errors list and stops checking this route
@@ -156,19 +157,19 @@ class DatabaseProcessor:
                     hours, minutes = time.split(":")
                     current_time = int(hours) * 60 + int(minutes)
                     if current_time <= previous_time:
-                        self._time_errors.append((bus_id, stop_name))
+                        self._arrival_time_errors.append((bus_id, stop_name))
                         break
                     previous_time = current_time
         except ProcessorError:
             raise
 
-    def print_time_errors(self) -> None:
+    def print_arrival_time_errors(self) -> None:
         """Prints result of check_time_errors()"""
         try:
-            self._check_time_errors()
+            self._check_arrival_time_errors()
             print("Arrival time test:")
-            if self._time_errors:
-                for bus, stop in self._time_errors:
+            if self._arrival_time_errors:
+                for bus, stop in self._arrival_time_errors:
                     print(f"bus_id line {bus}: wrong time on station {stop}")
             else:
                 print("OK")
@@ -181,6 +182,9 @@ class DatabaseProcessor:
         then adding errors in set errors_stops.
         """
         try:
+            self._check_arrival_time_errors()
+            if self._arrival_time_errors:
+                raise ArrivalTimeProcessorError
             self.calculate_stops()
             transfer_stops = self._find_transfer_stops()
             for i in self._database:

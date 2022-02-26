@@ -19,3 +19,7 @@ class DataTypeProcessorError(ProcessorError):
 
 class FormatFieldsProcessorError(ProcessorError):
     pass
+
+
+class ArrivalTimeProcessorError(ProcessorError):
+    pass
