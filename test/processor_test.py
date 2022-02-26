@@ -67,14 +67,14 @@ class DatabaseProcessorTest(TestCase):
                             }
                            ]
         my_processor = DatabaseProcessor(wrong_id_record)
-        my_processor.check_data_type()
+        my_processor._check_data_type()
 
         right_dict = dict(bus_id=1, stop_id=1, stop_name=2, next_stop=1, stop_type=1, a_time=2)
 
-        self.assertDictContainsSubset(right_dict, my_processor.type_errors)
+        self.assertDictContainsSubset(right_dict, my_processor._type_errors)
 
         # self.assertEqual(my_processor.type_errors, my_processor.type_errors | right_dict)
-        self.assertEqual(my_processor.total_type_errors, 8)
+        self.assertEqual(my_processor._total_type_errors, 8)
 
     def test_data_without_type_error(self):
         """Check 'bus_id' without errors."""
@@ -86,12 +86,12 @@ class DatabaseProcessorTest(TestCase):
                               "a_time": "8:12"
                               }]
         my_processor = DatabaseProcessor(correct_id_record)
-        my_processor.check_data_type()
+        my_processor._check_data_type()
 
         right_dict = dict(bus_id=0, stop_id=0, stop_name=0, next_stop=0, stop_type=0, a_time=0)
 
-        self.assertDictContainsSubset(right_dict, my_processor.type_errors)
-        self.assertEqual(my_processor.total_type_errors, 0)
+        self.assertDictContainsSubset(right_dict, my_processor._type_errors)
+        self.assertEqual(my_processor._total_type_errors, 0)
 
     def test_without_format_error(self):
         """Check without errors"""
@@ -124,12 +124,12 @@ class DatabaseProcessorTest(TestCase):
                               "a_time": "08:12"
                               }]
         my_processor = DatabaseProcessor(correct_id_record)
-        my_processor.check_format_fields()
+        my_processor._check_format_fields()
 
         correct_error_dict = dict(stop_name=0, stop_type=0, a_time=0)
 
-        self.assertDictContainsSubset(correct_error_dict, my_processor.format_errors)
-        self.assertEqual(my_processor.total_format_errors, 0)
+        self.assertDictContainsSubset(correct_error_dict, my_processor._format_errors)
+        self.assertEqual(my_processor._total_format_errors, 0)
 
     def test_find_a_time_format_error(self):
         """Check a_time without errors"""
@@ -184,12 +184,12 @@ class DatabaseProcessorTest(TestCase):
                               }
                              ]
         my_processor = DatabaseProcessor(correct_id_record)
-        my_processor.check_format_fields()
+        my_processor._check_format_fields()
 
         correct_error_dict = dict(stop_name=0, stop_type=0, a_time=7)
 
-        self.assertDictContainsSubset(correct_error_dict, my_processor.format_errors)
-        self.assertEqual(my_processor.total_format_errors, 7)
+        self.assertDictContainsSubset(correct_error_dict, my_processor._format_errors)
+        self.assertEqual(my_processor._total_format_errors, 7)
 
     def test_find_stop_name_format_error(self):
         """Check without errors"""
@@ -222,12 +222,12 @@ class DatabaseProcessorTest(TestCase):
                               "a_time": "08:12"
                               }]
         my_processor = DatabaseProcessor(correct_id_record)
-        my_processor.check_format_fields()
+        my_processor._check_format_fields()
 
         correct_error_dict = dict(stop_name=4, stop_type=0, a_time=0)
 
-        self.assertDictContainsSubset(correct_error_dict, my_processor.format_errors)
-        self.assertEqual(my_processor.total_format_errors, 4)
+        self.assertDictContainsSubset(correct_error_dict, my_processor._format_errors)
+        self.assertEqual(my_processor._total_format_errors, 4)
 
     def test_find_stop_type_format_error(self):
         """Check without errors"""
@@ -260,12 +260,12 @@ class DatabaseProcessorTest(TestCase):
                               "a_time": "08:12"
                               }]
         my_processor = DatabaseProcessor(correct_id_record)
-        my_processor.check_format_fields()
+        my_processor._check_format_fields()
 
         correct_error_dict = dict(stop_name=0, stop_type=4, a_time=0)
 
-        self.assertDictContainsSubset(correct_error_dict, my_processor.format_errors)
-        self.assertEqual(my_processor.total_format_errors, 4)
+        self.assertDictContainsSubset(correct_error_dict, my_processor._format_errors)
+        self.assertEqual(my_processor._total_format_errors, 4)
 
     def test_find_format_error(self):
         """Check without errors"""
@@ -352,12 +352,12 @@ class DatabaseProcessorTest(TestCase):
             }
         ]
         my_processor = DatabaseProcessor(correct_id_record)
-        my_processor.check_format_fields()
+        my_processor._check_format_fields()
 
         correct_error_dict = dict(stop_name=3, stop_type=2, a_time=4)
 
-        self.assertDictContainsSubset(correct_error_dict, my_processor.format_errors)
-        self.assertEqual(my_processor.total_format_errors, 9)
+        self.assertDictContainsSubset(correct_error_dict, my_processor._format_errors)
+        self.assertEqual(my_processor._total_format_errors, 9)
 
     def test_calculate_stops(self):
         """Checking creating bus_route_info"""
@@ -444,7 +444,7 @@ class DatabaseProcessorTest(TestCase):
 
         my_processor.calculate_stops()
 
-        self.assertDictContainsSubset(correct_bus_route_info, my_processor.bus_route_info)
+        self.assertDictContainsSubset(correct_bus_route_info, my_processor._bus_route_info)
 
     def test_calculate_stops_with_DataTypeProcessorError_broken_bus_id(self):
         """Checking DatabaseProcessor.calculate_stops with broken type 'bus_id' """
@@ -565,7 +565,7 @@ class DatabaseProcessorTest(TestCase):
         correct_transfer_list = ["Elm Street", "Sesame Street", "Sunset Boulevard"]
         my_processor = DatabaseProcessor(db)
         my_processor.calculate_stops()
-        answer = my_processor.find_transfer_stops()
+        answer = my_processor._find_transfer_stops()
 
         self.assertListEqual(answer, correct_transfer_list)
 
@@ -590,9 +590,9 @@ class DatabaseProcessorTest(TestCase):
             }
         ]
         my_processor = DatabaseProcessor(db)
-        my_processor.check_time_errors()
+        my_processor._check_time_errors()
 
-        self.assertFalse(my_processor.time_errors)
+        self.assertFalse(my_processor._time_errors)
 
     def test_find_time_errors(self):
         """Check DatabaseProcessor.check_time_errors() with wrong data."""
@@ -679,10 +679,10 @@ class DatabaseProcessorTest(TestCase):
             }
         ]
         my_processor = DatabaseProcessor(db)
-        my_processor.check_time_errors()
+        my_processor._check_time_errors()
         correct_error_list = [(128, "Fifth Avenue"), (256, "Sunset Boulevard")]
 
-        self.assertListEqual(my_processor.time_errors, correct_error_list)
+        self.assertListEqual(my_processor._time_errors, correct_error_list)
 
     def test_find_demand_errors_with_correct_data(self):
         """Check DatabaseProcessor.check_demand_errors() with correct data."""
@@ -705,9 +705,9 @@ class DatabaseProcessorTest(TestCase):
             }
         ]
         my_processor = DatabaseProcessor(db)
-        my_processor.check_demand_errors()
+        my_processor._check_demand_errors()
 
-        self.assertFalse(my_processor.errors_stops)
+        self.assertFalse(my_processor._errors_stops)
 
     def test_find_demand_errors(self):
         """Check DatabaseProcessor.check_demand_errors() with wrong data."""
@@ -794,10 +794,10 @@ class DatabaseProcessorTest(TestCase):
             }
         ]
         my_processor = DatabaseProcessor(db)
-        my_processor.check_demand_errors()
+        my_processor._check_demand_errors()
         correct_error_list = {'Sunset Boulevard', 'Elm Street'}
 
-        self.assertSetEqual(my_processor.errors_stops, correct_error_list)
+        self.assertSetEqual(my_processor._errors_stops, correct_error_list)
 
 
 if __name__ == "__main__":
