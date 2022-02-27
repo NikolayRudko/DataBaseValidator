@@ -186,11 +186,10 @@ class DatabaseProcessor:
         then adding errors in set errors_stops.
         """
         try:
-            # todo fix it
-            # self._check_arrival_time_errors()
-            # if self._arrival_time_errors:
-            #     raise ArrivalTimeProcessorError
-            self._calculate_stops()
+            if not self._arrival_time_errors:
+                self._check_arrival_time_errors()
+            if self._arrival_time_errors:
+                raise ArrivalTimeProcessorError
             transfer_stops = self._find_transfer_stops()
             for i in self._database:
                 if i["stop_type"] == "O" and i["stop_name"] in transfer_stops:
