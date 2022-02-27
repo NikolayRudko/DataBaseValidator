@@ -617,6 +617,38 @@ class DatabaseProcessorTest(TestCase):
 
         self.assertFalse(my_processor._arrival_time_errors)
 
+    def test_check_arrival_time_errors_with_DataTypeProcessorError_broken_bus_id(self):
+        """Checking DatabaseProcessor.calculate_stops with broken type 'bus_id' """
+        incorrect_record = [
+            {
+                "bus_id": "128",
+                "stop_id": 1,
+                "stop_name": "Prospekt Avenue",
+                "next_stop": 3,
+                "stop_type": "S",
+                "a_time": "08:12"
+            }
+        ]
+        my_processor = DatabaseProcessor(incorrect_record)
+
+        self.assertRaises(DataTypeProcessorError, my_processor._check_arrival_time_errors)
+
+    def test_check_arrival_time_errors_with_FormatFieldsProcessorError_stop_name(self):
+        """Checking DatabaseProcessor.calculate_stops with broken format field 'stop_name' """
+        correct_record = [
+            {
+                "bus_id": 128,
+                "stop_id": 1,
+                "stop_name": "Prospekt Av",
+                "next_stop": 3,
+                "stop_type": "S",
+                "a_time": "08:12"
+            }
+        ]
+        my_processor = DatabaseProcessor(correct_record)
+
+        self.assertRaises(FormatFieldsProcessorError, my_processor._check_arrival_time_errors)
+
     def test_find_time_errors(self):
         """Check DatabaseProcessor.check_time_errors() with wrong data."""
         db = [
@@ -821,6 +853,38 @@ class DatabaseProcessorTest(TestCase):
         correct_error_list = {'Sunset Boulevard', 'Elm Street'}
 
         self.assertSetEqual(my_processor._demand_stops_errors, correct_error_list)
+
+    def test_check_demand_errors_with_DataTypeProcessorError_broken_bus_id(self):
+        """Checking DatabaseProcessor.calculate_stops with broken type 'bus_id' """
+        incorrect_record = [
+            {
+                "bus_id": "128",
+                "stop_id": 1,
+                "stop_name": "Prospekt Avenue",
+                "next_stop": 3,
+                "stop_type": "S",
+                "a_time": "08:12"
+            }
+        ]
+        my_processor = DatabaseProcessor(incorrect_record)
+
+        self.assertRaises(DataTypeProcessorError, my_processor._check_demand_errors)
+
+    def test_check_demand_errors_with_FormatFieldsProcessorError_stop_name(self):
+        """Checking DatabaseProcessor.calculate_stops with broken format field 'stop_name' """
+        correct_record = [
+            {
+                "bus_id": 128,
+                "stop_id": 1,
+                "stop_name": "Prospekt Av",
+                "next_stop": 3,
+                "stop_type": "S",
+                "a_time": "08:12"
+            }
+        ]
+        my_processor = DatabaseProcessor(correct_record)
+
+        self.assertRaises(FormatFieldsProcessorError, my_processor._check_demand_errors)
 
 
 if __name__ == "__main__":
