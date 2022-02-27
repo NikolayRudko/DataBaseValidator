@@ -53,14 +53,23 @@ class DatabaseProcessor:
         stop_type - must be 'S', 'O','F' or empty string.
         a_time - must be 24 hours formate, hh:mm.
         """
-        validation_fields = {'stop_name': re.compile(r"^([A-Z]\w+\s)+(Road|Avenue|Boulevard|Street)$"),
-                             'stop_type': re.compile(r"^[SOF]?$"),
-                             'a_time': re.compile(r"^([01]\d|2[0-3])(:)([0-5]\d)$")}
-        for stop in self._database:
-            for key, value in stop.items():
-                if key in validation_fields and not validation_fields[key].match(value):
-                    self._format_errors[key] += 1
-        self._total_format_errors = sum(self._format_errors.values())
+        try:
+            # check type of data
+            if not self._total_type_errors:
+                self._check_data_type()
+            if self._total_type_errors != 0:
+                raise DataTypeProcessorError
+
+            validation_fields = {'stop_name': re.compile(r"^([A-Z]\w+\s)+(Road|Avenue|Boulevard|Street)$"),
+                                 'stop_type': re.compile(r"^[SOF]?$"),
+                                 'a_time': re.compile(r"^([01]\d|2[0-3])(:)([0-5]\d)$")}
+            for stop in self._database:
+                for key, value in stop.items():
+                    if key in validation_fields and not validation_fields[key].match(value):
+                        self._format_errors[key] += 1
+            self._total_format_errors = sum(self._format_errors.values())
+        except ProcessorError:
+            raise
 
     def print_format_fields_errors(self) -> None:
         """Prints result check_format_fields()"""

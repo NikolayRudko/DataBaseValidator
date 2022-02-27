@@ -230,7 +230,7 @@ class DatabaseProcessorTest(TestCase):
         self.assertEqual(my_processor._total_format_errors, 4)
 
     def test_find_stop_type_format_error(self):
-        """Check without errors"""
+        """Check errors in stop_type"""
         correct_id_record = [{"bus_id": 128,
                               "stop_id": 1,
                               "stop_name": "Prospekt Avenue",
@@ -256,19 +256,19 @@ class DatabaseProcessorTest(TestCase):
                               "stop_id": 1,
                               "stop_name": "Sunset Boulevard",
                               "next_stop": 3,
-                              "stop_type": "OO",
+                              "stop_type": "O",
                               "a_time": "08:12"
                               }]
         my_processor = DatabaseProcessor(correct_id_record)
         my_processor._check_format_fields()
 
-        correct_error_dict = dict(stop_name=0, stop_type=4, a_time=0)
+        correct_error_dict = dict(stop_name=0, stop_type=3, a_time=0)
 
         self.assertDictContainsSubset(correct_error_dict, my_processor._format_errors)
-        self.assertEqual(my_processor._total_format_errors, 4)
+        self.assertEqual(my_processor._total_format_errors, 3)
 
     def test_find_format_error(self):
-        """Check without errors"""
+        """Check complex errors"""
         correct_id_record = [
             {
                 "bus_id": 128,
@@ -291,7 +291,7 @@ class DatabaseProcessorTest(TestCase):
                 "stop_id": 5,
                 "stop_name": "Fifth Avenue",
                 "next_stop": 7,
-                "stop_type": "OO",
+                "stop_type": "O",
                 "a_time": "08:25"
             },
             {
@@ -354,10 +354,10 @@ class DatabaseProcessorTest(TestCase):
         my_processor = DatabaseProcessor(correct_id_record)
         my_processor._check_format_fields()
 
-        correct_error_dict = dict(stop_name=3, stop_type=2, a_time=4)
+        correct_error_dict = dict(stop_name=3, stop_type=1, a_time=4)
 
         self.assertDictContainsSubset(correct_error_dict, my_processor._format_errors)
-        self.assertEqual(my_processor._total_format_errors, 9)
+        self.assertEqual(my_processor._total_format_errors, 8)
 
     def test_calculate_stops(self):
         """Checking creating bus_route_info"""
