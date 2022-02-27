@@ -17,7 +17,7 @@ class DatabaseProcessor:
         self._total_format_errors = 0
         self._bus_route_info = {}
         self._arrival_time_errors = []
-        self._errors_stops = set()
+        self._demand_stops_errors = set()
 
     def _check_data_type(self) -> None:
         """
@@ -40,7 +40,8 @@ class DatabaseProcessor:
 
     def print_data_type_errors(self) -> None:
         """Prints result check_data_type()"""
-        self._check_data_type()
+        if self._total_type_errors == 0:
+            self._check_data_type()
         print(f"Type and required field validation: {self._total_type_errors} errors")
         for k, v in self._type_errors.items():
             print(f'{k}: {v}')
@@ -73,7 +74,8 @@ class DatabaseProcessor:
 
     def print_format_fields_errors(self) -> None:
         """Prints result check_format_fields()"""
-        self._check_format_fields()
+        if self._total_format_errors == 0:
+            self._check_format_fields()
         print(f"Format validation: {self._total_format_errors} errors")
         for k, v in self._format_errors.items():
             print(f'{k}: {v}')
@@ -179,7 +181,8 @@ class DatabaseProcessor:
     def print_arrival_time_errors(self) -> None:
         """Prints result of check_time_errors()"""
         try:
-            self._check_arrival_time_errors()
+            if not self._arrival_time_errors:
+                self._check_arrival_time_errors()
             print("Arrival time test:")
             if self._arrival_time_errors:
                 for bus, stop in self._arrival_time_errors:
@@ -202,7 +205,7 @@ class DatabaseProcessor:
             transfer_stops = self._find_transfer_stops()
             for i in self._database:
                 if i["stop_type"] == "O" and i["stop_name"] in transfer_stops:
-                    self._errors_stops.add(i["stop_name"])
+                    self._demand_stops_errors.add(i["stop_name"])
         except ProcessorError:
             raise
 
@@ -212,8 +215,9 @@ class DatabaseProcessor:
         The errors are also sorted alphabetically.
         """
         try:
-            self._check_demand_errors()
+            if not self._demand_stops_errors:
+                self._check_demand_errors()
             print("On demand stops test:")
-            print("Wrong stop type: {0}".format(sorted(self._errors_stops)) if self._errors_stops else "OK")
+            print("Wrong stop type: {0}".format(sorted(self._demand_stops_errors)) if self._demand_stops_errors else "OK")
         except ProcessorError:
             raise

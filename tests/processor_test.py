@@ -723,7 +723,7 @@ class DatabaseProcessorTest(TestCase):
         my_processor = DatabaseProcessor(db)
         my_processor._check_demand_errors()
 
-        self.assertFalse(my_processor._errors_stops)
+        self.assertFalse(my_processor._demand_stops_errors)
 
     def test_find_demand_errors(self):
         """Check DatabaseProcessor.check_demand_errors() with wrong data."""
@@ -813,7 +813,7 @@ class DatabaseProcessorTest(TestCase):
         my_processor._check_demand_errors()
         correct_error_list = {'Sunset Boulevard', 'Elm Street'}
 
-        self.assertSetEqual(my_processor._errors_stops, correct_error_list)
+        self.assertSetEqual(my_processor._demand_stops_errors, correct_error_list)
 
 
 if __name__ == "__main__":
