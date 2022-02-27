@@ -59,7 +59,7 @@ class DatabaseProcessor:
             if not self._total_type_errors:
                 self._check_data_type()
             if self._total_type_errors != 0:
-                raise DataTypeProcessorError
+                raise DataTypeProcessorError("Data contain {} type errors".format(self._total_type_errors))
 
             validation_fields = {'stop_name': re.compile(r"^([A-Z]\w+\s)+(Road|Avenue|Boulevard|Street)$"),
                                  'stop_type': re.compile(r"^[SOF]?$"),
@@ -93,11 +93,11 @@ class DatabaseProcessor:
         try:
             self._check_data_type()
             if self._total_type_errors:
-                raise DataTypeProcessorError
+                raise DataTypeProcessorError("Data contain {} type errors".format(self._total_type_errors))
 
             self._check_format_fields()
             if self._total_format_errors:
-                raise FormatFieldsProcessorError
+                raise FormatFieldsProcessorError("Data contain {} format errors".format(self._total_format_errors))
 
             for stop in self._database:
                 bus_id = stop['bus_id']
@@ -128,12 +128,15 @@ class DatabaseProcessor:
 
         :return: List of transfer stops.
         """
-        if not self._bus_route_info:
-            self._calculate_stops()
-        routes_stops = [stop[0] for stops in self._bus_route_info.values() for stop in stops["stops"]]
-        stop_frequency = Counter(routes_stops).most_common()
-        transfer_stops = sorted([stop[0] for stop in stop_frequency if stop[1] > 1])
-        return transfer_stops
+        try:
+            if not self._bus_route_info:
+                self._calculate_stops()
+            routes_stops = [stop[0] for stops in self._bus_route_info.values() for stop in stops["stops"]]
+            stop_frequency = Counter(routes_stops).most_common()
+            transfer_stops = sorted([stop[0] for stop in stop_frequency if stop[1] > 1])
+            return transfer_stops
+        except ProcessorError:
+            raise
 
     def print_stops_info(self) -> None:
         """Prints info about types of stops."""
@@ -201,7 +204,7 @@ class DatabaseProcessor:
             if not self._arrival_time_errors:
                 self._check_arrival_time_errors()
             if self._arrival_time_errors:
-                raise ArrivalTimeProcessorError
+                raise ArrivalTimeProcessorError("Data contain {} arrival time errors".format(self._arrival_time_errors))
             transfer_stops = self._find_transfer_stops()
             for i in self._database:
                 if i["stop_type"] == "O" and i["stop_name"] in transfer_stops:
