@@ -17,6 +17,13 @@ class DatabaseProcessorTest(TestCase):
                             "a_time": "8:12"
                             },
                            {"bus_id": 128,
+                            "stop_id": 1,
+                            "stop_name": "Prospekt Avenue",
+                            "next_stop": 3,
+                            "stop_type": "SS",
+                            "a_time": "8:12"
+                            },
+                           {"bus_id": 128,
                             "stop_id": "1",
                             "stop_name": "Prospekt Avenue",
                             "next_stop": 3,
@@ -69,12 +76,12 @@ class DatabaseProcessorTest(TestCase):
         my_processor = DatabaseProcessor(wrong_id_record)
         my_processor._check_data_type()
 
-        right_dict = dict(bus_id=1, stop_id=1, stop_name=2, next_stop=1, stop_type=1, a_time=2)
+        right_dict = dict(bus_id=1, stop_id=1, stop_name=2, next_stop=1, stop_type=2, a_time=2)
 
         self.assertDictContainsSubset(right_dict, my_processor._type_errors)
 
         # self.assertEqual(my_processor.type_errors, my_processor.type_errors | right_dict)
-        self.assertEqual(my_processor._total_type_errors, 8)
+        self.assertEqual(my_processor._total_type_errors, 9)
 
     def test_data_without_type_error(self):
         """Check 'bus_id' without errors."""
