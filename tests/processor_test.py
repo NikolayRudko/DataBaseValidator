@@ -359,6 +359,22 @@ class DatabaseProcessorTest(TestCase):
         self.assertDictContainsSubset(correct_error_dict, my_processor._format_errors)
         self.assertEqual(my_processor._total_format_errors, 8)
 
+    def test_find_format_error_with_DataTypeProcessorError(self):
+        """Checking DatabaseProcessor.calculate_stops with broken type 'bus_id' """
+        incorrect_record = [
+            {
+                "bus_id": "128",
+                "stop_id": 1,
+                "stop_name": "Prospekt Avenue",
+                "next_stop": 3,
+                "stop_type": "S",
+                "a_time": "08:12"
+            }
+        ]
+        my_processor = DatabaseProcessor(incorrect_record)
+
+        self.assertRaises(DataTypeProcessorError, my_processor._check_format_fields)
+
     def test_calculate_stops(self):
         """Checking creating bus_route_info"""
         correct_record = [
@@ -448,7 +464,7 @@ class DatabaseProcessorTest(TestCase):
 
     def test_calculate_stops_with_DataTypeProcessorError_broken_bus_id(self):
         """Checking DatabaseProcessor.calculate_stops with broken type 'bus_id' """
-        correct_record = [
+        incorrect_record = [
             {
                 "bus_id": "128",
                 "stop_id": 1,
@@ -458,7 +474,7 @@ class DatabaseProcessorTest(TestCase):
                 "a_time": "08:12"
             }
         ]
-        my_processor = DatabaseProcessor(correct_record)
+        my_processor = DatabaseProcessor(incorrect_record)
 
         self.assertRaises(DataTypeProcessorError, my_processor._calculate_stops)
 
