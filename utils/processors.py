@@ -1,5 +1,6 @@
 import re
 from collections import Counter
+from functools import wraps
 
 from utils.processor_errors import DataTypeProcessorError
 from utils.processor_errors import FormatFieldsProcessorError
@@ -43,14 +44,25 @@ class DatabaseProcessor:
                     self._type_errors[key] += 1
         self._total_type_errors = sum(self._type_errors.values())
 
+    def _data_type_validator(func):
+        @wraps(func)
+        def wrapper(*args):
+            # check type of data
+            if args[0]._total_type_errors == 0:
+                args[0]._check_data_type()
+            ret = func(*args)
+            return ret
+
+        return wrapper
+
+    @_data_type_validator
     def print_data_type_errors(self) -> None:
         """Prints result check_data_type()"""
-        if self._total_type_errors == 0:
-            self._check_data_type()
         print(f"Type and required field validation: {self._total_type_errors} errors")
         for k, v in self._type_errors.items():
             print(f'{k}: {v}')
 
+    @_data_type_validator
     def _check_format_fields(self) -> None:
         """
         Checks correctness of format fields: stop_name, stop_type, a_time.
@@ -59,9 +71,6 @@ class DatabaseProcessor:
         stop_type - must be 'S', 'O','F' or empty string.
         a_time - must be 24 hours formate, hh:mm.
         """
-        # check type of data
-        if not self._total_type_errors:
-            self._check_data_type()
         if self._total_type_errors != 0:
             raise DataTypeProcessorError("Data contain {} type errors".format(self._total_type_errors))
         stop_name_pattern = r"""
@@ -109,14 +118,25 @@ class DatabaseProcessor:
                     self._format_errors[key] += 1
         self._total_format_errors = sum(self._format_errors.values())
 
+    def _data_format_validator(func):
+        @wraps(func)
+        def wrapper(*args):
+            # check format of data
+            if args[0]._total_format_errors == 0:
+                args[0]._check_format_fields()
+            ret = func(*args)
+            return ret
+
+        return wrapper
+
+    @_data_format_validator
     def print_format_fields_errors(self) -> None:
         """Prints result check_format_fields()"""
-        if self._total_format_errors == 0:
-            self._check_format_fields()
         print(f"Format validation: {self._total_format_errors} errors")
         for k, v in self._format_errors.items():
             print(f'{k}: {v}')
 
+    @_data_format_validator
     def _calculate_stops(self) -> None:
         """
         Are processing database, then creating dict bus_route_info with information about start, final
@@ -127,7 +147,6 @@ class DatabaseProcessor:
                         [("Sesame Street", "08:37")]},
                 ...}
         """
-        self._check_data_type()
         if self._total_type_errors:
             raise DataTypeProcessorError("Data contain {} type errors".format(self._total_type_errors))
 
@@ -145,31 +164,39 @@ class DatabaseProcessor:
             elif stop["stop_type"] == "F":
                 bus["finish"].append(stop_info)
 
+    def _stops_handler(func):
+        @wraps(func)
+        def wrapper(*args):
+            # calculate stops
+            if not args[0]._bus_route_info:
+                args[0]._calculate_stops()
+            ret = func(*args)
+            return ret
+
+        return wrapper
+
+    @_stops_handler
     def print_bus_info(self) -> None:
         """Prints info about buses routes."""
-        if not self._bus_route_info:
-            self._calculate_stops()
         print("Line names and number of stops:")
         for bus_id, stops in self._bus_route_info.items():
             print(f'bus_id: {bus_id}, stops: {len(stops["stops"])}')
 
+    @_stops_handler
     def _find_transfer_stops(self) -> list:
         """
         Finds transfer stops. A transfer stop is a stop that is included in several routes.
 
         :return: List of transfer stops.
         """
-        if not self._bus_route_info:
-            self._calculate_stops()
         routes_stops = [stop[0] for stops in self._bus_route_info.values() for stop in stops["stops"]]
         stop_frequency = Counter(routes_stops).most_common()
         transfer_stops = sorted([stop[0] for stop in stop_frequency if stop[1] > 1])
         return transfer_stops
 
+    @_stops_handler
     def print_stops_info(self) -> None:
         """Prints info about types of stops."""
-        if not self._bus_route_info:
-            self._calculate_stops()
         start_stops = set()
         finish_stops = set()
         for bus_id, stops in self._bus_route_info.items():
@@ -185,14 +212,13 @@ class DatabaseProcessor:
             print(f'Transfer stops: {len(transfer_stops)} {transfer_stops}')
             print(f'Finish stops: {len(finish_stops)} {sorted(finish_stops)}')
 
+    @_stops_handler
     def _check_arrival_time_errors(self) -> None:
         """
         Checks the time on the route, if the time of the next station is less or more than the previous one,
         the program adds an error to the time_errors list and stops checking this route
         and starts checking the next one.
         """
-        if not self._bus_route_info:
-            self._calculate_stops()
         for bus_id, bus in self._bus_route_info.items():
             previous_time = 0
             for stop_name, time in bus["stops"]:
@@ -203,10 +229,20 @@ class DatabaseProcessor:
                     break
                 previous_time = current_time
 
+    def _arrival_time_validator(func):
+        @wraps(func)
+        def wrapper(*args):
+            # check arrival time
+            if not args[0]._arrival_time_errors:
+                args[0]._check_arrival_time_errors()
+            ret = func(*args)
+            return ret
+
+        return wrapper
+
+    @_arrival_time_validator
     def print_arrival_time_errors(self) -> None:
         """Prints result of check_time_errors()"""
-        if not self._arrival_time_errors:
-            self._check_arrival_time_errors()
         print("Arrival time test:")
         if self._arrival_time_errors:
             for bus, stop in self._arrival_time_errors:
@@ -214,13 +250,12 @@ class DatabaseProcessor:
         else:
             print("OK")
 
+    @_arrival_time_validator
     def _check_demand_errors(self) -> None:
         """
         Are checking the errors if departure points, final stops and transfer stations have attribute -O("On-demand"),
         then adding errors in set errors_stops.
         """
-        if not self._arrival_time_errors:
-            self._check_arrival_time_errors()
         if self._arrival_time_errors:
             raise ArrivalTimeProcessorError("Data contain {} arrival time errors".format(self._arrival_time_errors))
         transfer_stops = self._find_transfer_stops()
