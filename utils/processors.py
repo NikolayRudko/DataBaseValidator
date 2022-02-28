@@ -30,7 +30,14 @@ class DatabaseProcessor:
                 if type(value) != correct_data_type[key]:
                     self._type_errors[key] += 1
                     continue
-                if key == "stop_type" and not re.match(r"^.?$", value):
+                stop_type_pattern = r"""
+                ^                           # start of string
+                .                           # any of chapter
+                ?                           # zero or one consecutive letter
+                $                           # end of string    
+                """
+                stop_type_regex = re.compile(stop_type_pattern, re.VERBOSE)
+                if key == "stop_type" and not stop_type_regex.match(value):
                     self._type_errors[key] += 1
                 if key in required_fields and value == "":
                     self._type_errors[key] += 1
@@ -57,10 +64,45 @@ class DatabaseProcessor:
             self._check_data_type()
         if self._total_type_errors != 0:
             raise DataTypeProcessorError("Data contain {} type errors".format(self._total_type_errors))
-
-        validation_fields = {'stop_name': re.compile(r"^([A-Z]\w+\s)+(Road|Avenue|Boulevard|Street)$"),
-                             'stop_type': re.compile(r"^[SOF]?$"),
-                             'a_time': re.compile(r"^([01]\d|2[0-3])(:)([0-5]\d)$")}
+        stop_name_pattern = r"""
+        ^                                   # start of string
+        (                                   # start of first part of name 
+        [A-Z]                               # first capital letter of word
+        \w                                  # any letter, digit or underscore. Equivalent to [a-zA-Z0-9_]
+        +                                   # one or more consecutive `\w` characters.
+        \s                                  # any whitespace chapters
+        )                                   # end of first part of name
+        +                                   # one or more consecutive words with capital letter
+        (                                   # start of second part of word
+        Road|Avenue|Boulevard|Street        # one of this word is end of second part name
+        )                                   # end of second part of word                    
+        $                                   # end of string
+        """
+        stop_type_pattern = r"""
+        ^                                   # start of string                       
+        [SOF]                               # a single chapter of: S,O or F 
+        ?                                   # zero or one consecutive letter
+        $                                   # end of string
+        """
+        a_time_pattern = r"""
+        ^                                   # start of string 
+        (                                   # start of hour part
+        [01]                                # first digit 1 or 0
+        \d                                  # any of digit
+        |                                   # or 
+        2                                   # digit 2
+        [0-3]                               # a single chapter of: 0,1,2 or 3 
+        )                                   # end of hour part
+        (:)                                 # delimiter  
+        (                                   # end of minutes part
+        [0-5]                               # a single chapter of: 0-5 
+        \d                                  # any of digit
+        )                                   # end of minutes part
+        $                                   # end of string
+        """
+        validation_fields = {'stop_name': re.compile(stop_name_pattern, re.VERBOSE),
+                             'stop_type': re.compile(stop_type_pattern, re.VERBOSE),
+                             'a_time': re.compile(a_time_pattern, re.VERBOSE)}
         for stop in self._database:
             for key, value in stop.items():
                 if key in validation_fields and not validation_fields[key].match(value):
@@ -194,5 +236,4 @@ class DatabaseProcessor:
         if not self._demand_stops_errors:
             self._check_demand_errors()
         print("On demand stops test:")
-        print(
-            "Wrong stop type: {0}".format(sorted(self._demand_stops_errors)) if self._demand_stops_errors else "OK")
+        print("Wrong stop type: {0}".format(sorted(self._demand_stops_errors)) if self._demand_stops_errors else "OK")
