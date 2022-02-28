@@ -1,6 +1,6 @@
 import argparse
 
-from utils import input_database_file, input_database_str
+from utils.proccesor_handler import input_database_file, input_database_str
 from utils.processors import DatabaseProcessor
 from utils.processor_errors import ProcessorError
 
