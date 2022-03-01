@@ -23,7 +23,7 @@ class DatabaseProcessor:
         for i in self._database:
             print()
             for j in i.items():
-                print(j)
+                print(*j, sep=" : ")
 
     def _check_data_type(self) -> None:
         """
