@@ -1,6 +1,6 @@
 import argparse
 
-from utils.proccesor_handler import input_database_file, input_database_str
+from utils.processor_handler import input_database_file, input_database_str
 from utils.processors import DatabaseProcessor
 from utils.processor_errors import ProcessorError
 
@@ -23,17 +23,20 @@ def main():
     parser.add_argument("-v", "--verification", choices=actions.keys(),
                         help="Choice type of verification.")
     args = parser.parse_args()
-    # input data
-    if args.file:
-        database_dict = input_database_file(args.file)
-    else:
-        database_dict = input_database_str()
-    # process data
-    db_bus_company = DatabaseProcessor(database_dict)
-    action = actions[args.verification]
+
     try:
+        # input data
+        if args.file:
+            database_dict = input_database_file(args.file)
+        else:
+            database_dict = input_database_str()
+        # process data
+        db_bus_company = DatabaseProcessor(database_dict)
+        action = actions[args.verification]
         action(db_bus_company)
     except ProcessorError as e:
+        print(e)
+    except Exception as e:
         print(e)
 
 

@@ -7,9 +7,15 @@ def input_database_str() -> list:
 
     :return: dict with data
     """
-    database = input("Input json string:")
-    database_dict = json.loads(database)
-    return database_dict
+    while True:
+        database = input("Input json string:")
+        try:
+            database_dict = json.loads(database)
+        except Exception as e:
+            print(e)
+            print("Invalid input")
+            continue
+        return database_dict
 
 
 def input_database_file(file_name: str) -> list:
