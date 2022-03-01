@@ -13,7 +13,8 @@ def main():
         "bus_info": DatabaseProcessor.print_bus_info,
         "stops_info": DatabaseProcessor.print_stops_info,
         "time_errors": DatabaseProcessor.print_arrival_time_errors,
-        "demand_errors": DatabaseProcessor.print_demand_errors
+        "demand_errors": DatabaseProcessor.print_demand_errors,
+        "print_info": DatabaseProcessor.get_database
     }
 
     parser = argparse.ArgumentParser()

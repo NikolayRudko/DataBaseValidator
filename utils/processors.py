@@ -18,6 +18,13 @@ class DatabaseProcessor:
         self._arrival_time_errors = []
         self._demand_stops_errors = set()
 
+    def get_database(self):
+        print("Input data:")
+        for i in self._database:
+            print()
+            for j in i.items():
+                print(j)
+
     def _check_data_type(self) -> None:
         """
         Check input data for compliance with documentation.
