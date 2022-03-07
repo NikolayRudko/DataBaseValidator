@@ -19,8 +19,8 @@ class DatabaseProcessor:
         self._demand_stops_errors = set()
 
     def get_database(self):
-        """Printing input data."""
-        print("Input data:")
+        """Printing input test_data."""
+        print("Input test_data:")
         for i in self._database:
             print()
             for j in i.items():
@@ -28,7 +28,7 @@ class DatabaseProcessor:
 
     def _check_data_type(self) -> None:
         """
-        Check input data for compliance with documentation.
+        Check input test_data for compliance with documentation.
         Fields 'stop_name', 'a_time' should not be empty.
         Errors are sorted and added to the _type_errors dictionary. The total number of errors is also calculated.
         """
@@ -55,7 +55,7 @@ class DatabaseProcessor:
     def _data_type_validator(func):
         @wraps(func)
         def wrapper(*args):
-            # check type of data
+            # check type of test_data
             if args[0]._total_type_errors == 0:
                 args[0]._check_data_type()
             ret = func(*args)
@@ -129,7 +129,7 @@ class DatabaseProcessor:
     def _data_format_validator(func):
         @wraps(func)
         def wrapper(*args):
-            # check format of data
+            # check format of test_data
             if args[0]._total_format_errors == 0:
                 args[0]._check_format_fields()
             ret = func(*args)

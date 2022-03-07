@@ -19,19 +19,19 @@ def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-f", "--file", default=None,
-                        help="Enter the path to the .json file with the data "
+                        help="Enter the path to the .json file with the test_data "
                              "otherwise it will be entered json-string through the console.")
     parser.add_argument("-v", "--verification", choices=actions.keys(),
                         help="Choice type of verification.")
     args = parser.parse_args()
 
     try:
-        # input data
+        # input test_data
         if args.file:
             database_dict = input_database_file(args.file)
         else:
             database_dict = input_database_str()
-        # process data
+        # process test_data
         db_bus_company = DatabaseProcessor(database_dict)
         action = actions[args.verification]
         action(db_bus_company)
