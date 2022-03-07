@@ -19,6 +19,7 @@ class DatabaseProcessor:
         self._demand_stops_errors = set()
 
     def get_database(self):
+        """Printing input data."""
         print("Input data:")
         for i in self._database:
             print()
@@ -29,7 +30,7 @@ class DatabaseProcessor:
         """
         Check input data for compliance with documentation.
         Fields 'stop_name', 'a_time' should not be empty.
-        Errors are sorted and added to the type_errors dictionary. The total number of errors is also calculated.
+        Errors are sorted and added to the _type_errors dictionary. The total number of errors is also calculated.
         """
         correct_data_type = dict(bus_id=int, stop_id=int, stop_name=str, next_stop=int, stop_type=str, a_time=str)
         required_fields = ("stop_name", 'a_time')
@@ -64,7 +65,7 @@ class DatabaseProcessor:
 
     @_data_type_validator
     def print_data_type_errors(self) -> None:
-        """Prints result check_data_type()"""
+        """Prints result _check_data_type()"""
         print(f"Type and required field validation: {self._total_type_errors} errors")
         for k, v in self._type_errors.items():
             print(f'{k}: {v}')
@@ -138,7 +139,7 @@ class DatabaseProcessor:
 
     @_data_format_validator
     def print_format_fields_errors(self) -> None:
-        """Prints result check_format_fields()"""
+        """Prints result of _check_format_fields()"""
         print(f"Format validation: {self._total_format_errors} errors")
         for k, v in self._format_errors.items():
             print(f'{k}: {v}')
@@ -146,11 +147,11 @@ class DatabaseProcessor:
     @_data_format_validator
     def _calculate_stops(self) -> None:
         """
-        Are processing database, then creating dict bus_route_info with information about start, final
+        Are processing database, then creating dict _bus_route_info with information about start, final
         and intermediate stops.
 
         example: {"128": {[("Prospekt Avenue", "08:12")],
-                        [("Elm Street", "08:19"), ...., ("Fifth Avenue", "08:25")],
+                        [("Prospekt Avenue", "08:12"),("Elm Street", "08:19"), ... , ("Sesame Street", "08:37")],
                         [("Sesame Street", "08:37")]},
                 ...}
         """

@@ -33,7 +33,7 @@ python easyrider.py -f "some_file.json" -v "type_of_checks"
 ```
 or
 ```
-python easyrider.py --file "some_file.json" ---verification "type_of_checks"
+python easyrider.py --file "some_file.json" --verification "type_of_checks"
 ```
 
 **The types of checks:**
