@@ -1,5 +1,7 @@
 import json
+import logging
 
+logger = logging.getLogger("app.utils.processor_handler")
 
 def input_database_str() -> list:
     """
@@ -14,6 +16,7 @@ def input_database_str() -> list:
         except Exception as e:
             print(e)
             print("Invalid input")
+            logger.warning(e)
             continue
         return database_dict
 
